@@ -2,89 +2,92 @@
 
 OpenVScan is a web-based vulnerability scanner that integrates open-source tools with AI to deliver smarter, faster and more reliable pre-production security testing.
 
-## Planned Highlights
-
-- **Unified scanning pipeline** – OWASP ZAP, Nmap, Trivy, and custom scanners will be coordinated through a single workflow.
-- **AI-guided remediation** – LLM-backed services will summarize findings, filter likely false positives, and suggest fixes.
-- **Workspace-centric management** – Teams will organize targets, schedules, baselines, and historical findings per project.
-- **Extensible plugin model** – Contributors will add scanners, enrichments, or exporters with minimal boilerplate.
-- **Modern operator UX** – Dashboards will provide real-time visibility, drill-down reporting, and exportable artifacts.
-
 ## Planned Architecture
 
 | Tier | Stack | Responsibilities |
 | --- | --- | --- |
-| UI (`web/`) | Next.js 14, React, Tailwind | Scan setup, dashboards, reports, user workflows |
-| API (`api/`) | NestJS, TypeScript, PostgreSQL ORM | Projects, scans, auth, findings, task orchestration |
-| Workers | Containerized runners, message queue | Execute scanners, collect artifacts, push telemetry |
-| Storage | PostgreSQL, object storage, Redis | Persistent metadata, artifacts, queueing |
-| AI Services | gRPC/REST bridge to LLMs | Summaries, confidence scoring, remediation guidance |
+| UI (`web/`) | Next.js 15, React 19, Tailwind CSS | Scan setup, dashboards, reporting, multi-tenant UX |
+| API (`api/`) | NestJS 11, TypeScript, PostgreSQL ORM | Projects, auth, scan orchestration, findings API |
+| Workers | Containerized runners + message queue | Execute scanners, aggregate artifacts, stream telemetry |
+| Storage | PostgreSQL, object storage, Redis | Metadata, artifacts, coordination primitives |
+| AI Services | LLM providers | Summaries, deduplication, remediation guidance |
 
-## Repository Layout (Under Construction)
+## Repository Layout
 
 ```
 openvscan/
-├── api/                 # NestJS service (REST + background jobs)
-├── web/                 # Next.js application (UI dashboards & flows)
-├── deploy/              # Helm charts and infra manifests
+├── api/                 # NestJS 11 service (REST + background jobs)
+├── web/                 # Next.js 15 / React 19 application
+├── deploy/              # charts and infra manifests
 ├── docker/              # Local development containers & scripts
 ├── packages/            # Shared libraries (future)
 ├── scripts/             # Tooling, scanner runners, automation
 └── README.md
+└── LICENSE
 ```
 
-## Prerequisites (Expected)
-
-- macOS or Linux host with Docker Engine ≥ 24
-- Node.js ≥ 20 and [`pnpm`](https://pnpm.io) ≥ 9 for the workspace
-- Python ≥ 3.11 for select scanners
-- OpenAI-compatible API key (or compatible provider) exported in `.env`
-
-## Installation (Planned)
+## Installation
 
 ```bash
+git clone https://github.com/your-username/openvscan.git
+cd openvscan
 pnpm install
 ```
 
-> The repository will remain a pnpm workspace; root-level commands will target individual projects via filters (e.g. `pnpm --filter api ...`).
+> This repository will remain a pnpm workspace; use filters for project-specific commands (e.g., `pnpm --filter api …`).
 
-## Environment Configuration (Planned)
+## Environment Configuration
 
-1. Copy the template and populate secrets:
+1. Duplicate the root environment file:
    ```bash
    cp .env.example .env
    ```
-2. Override per-app settings (optional once available):
-   - `api/.env` for the NestJS service
+2. Populate service-specific overrides as they appear:
+   - `api/.env` for the NestJS backend
    - `web/.env.local` for the Next.js UI
-3. Expose the OpenAI-compatible key as `OPENAI_API_KEY` (or provider-specific equivalent).
 
 ## Running Locally (Roadmap)
 
-### Full stack (Docker)
+### Full Stack (Docker)
 
 ```bash
 docker compose up --build
 ```
 
-The UI will be served at <http://localhost:3000>; the API will default to <http://localhost:4000>.
+- UI will serve at <http://localhost:3000>.
+- API will expose <http://localhost:5000>.
 
-### API service only
+### API Only
 
 ```bash
 pnpm --filter api start:dev
 ```
 
-- Hot reload will be provided via the Nest CLI.
-- Swagger UI (if enabled) will live at `/docs`.
+- Nest CLI will provide hot reload.
+- Swagger (when enabled) will live at `/docs`.
 
-### Web UI only
+### Web UI Only
 
 ```bash
 pnpm --filter web dev
 ```
 
-- Next.js dev mode will proxy API calls to `localhost:4000`.
+- Next.js dev server will proxy API requests to `localhost:5000`.
+
+## Usage (Vision)
+
+1. Upload a target (artifact, URL, or Git connection).
+2. Select scanners (static analysis, dependency audit, DAST, container checks).
+3. Run the pipeline and allow AI triage to surface critical issues.
+4. Review findings in the dashboard and apply recommended fixes.
+5. Export reports (JSON, SARIF, PDF) for stakeholders.
+
+## Example Outcomes (Planned)
+
+- Critical findings such as SQL injection, XSS, RCE, SSRF.
+- Dependency exposure reports for outdated or vulnerable packages.
+- Infrastructure misconfiguration insights (e.g., Kubernetes, Terraform).
+- AI-enhanced remediation steps with code snippets and context.
 
 ## Testing & Quality (Planned)
 
@@ -97,30 +100,19 @@ pnpm test:e2e
 pytest tests/workers
 ```
 
-Static analysis (e.g. `pnpm --filter api lint`) and formatting (`pnpm format`) will run per workspace.
-
-## Deployment (Future)
-
-- Continuous delivery will be handled via GitHub Actions (see `.github/workflows/`).
-- Container images will push to the registry defined by `REGISTRY_URL`.
-- Kubernetes deploys will be managed with Helm charts in `deploy/helm/openvscan`.
-- Required secrets: `OPENAI_API_KEY`, `POSTGRES_URL`, `REDIS_URL`, `REGISTRY_USERNAME`, `REGISTRY_PASSWORD`, etc.
-
-## Roadmap
-
-- [ ] SARIF export for CI ingestion
-- [ ] Authenticated mobile app scanning
-- [ ] AI remediation for infrastructure-as-code templates
-- [ ] Enterprise SSO (SAML/OIDC)
-- [ ] Dynamic plugin marketplace
+Static analysis (`pnpm --filter api lint`) and formatting (`pnpm format`) will enforce workspace standards.
 
 ## Contributing
 
-1. Fork the project and create a feature branch.
-2. Run planned quality checks (`pnpm lint`, `pnpm test`, and relevant filters) before submitting a PR.
-3. Provide screenshots or recordings for UI-facing changes when available.
+1. Fork the repository and create a feature branch.
+2. Run `pnpm lint` and `pnpm test` (plus relevant filters) before opening a PR.
+3. Include screenshots or recordings for UI-facing changes.
 4. Reference linked issues and follow the [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
 
 ## License
 
-Licensed under the Apache License 2.0. See [LICENSE](./LICENSE) for more details.
+Licensed under the Apache License 2.0. See [LICENSE](./LICENSE) for terms.
+
+## Acknowledgements
+
+OpenVScan will build on trusted open-source security tools (e.g., OWASP ZAP, Nmap, Trivy) and layer AI-driven analysis to make vulnerability scanning more effective and accessible.
