@@ -2,6 +2,13 @@
 
 OpenVScan is a web-based vulnerability scanner that integrates open-source tools with AI to deliver smarter, faster and more reliable pre-production security testing.
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![GitHub stars](https://img.shields.io/github/stars/Buddhsen-tripathi/openvscan.svg?style=social&label=Star)](https://github.com/Buddhsen-tripathi/openvscan)
+[![Hacktoberfest](https://img.shields.io/badge/Hacktoberfest-2025-orange.svg)](https://hacktoberfest.com/)
+[![GitHub issues](https://img.shields.io/github/issues/Buddhsen-tripathi/openvscan.svg)](https://github.com/Buddhsen-tripathi/openvscan/issues)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/Buddhsen-tripathi/openvscan/actions)
+
+
 ## Planned Architecture
 
 | Tier | Stack | Responsibilities |
