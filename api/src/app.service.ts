@@ -5,4 +5,8 @@ export class AppService {
   getHello(): string {
     return 'OpenVScan API is running!';
   }
+
+  getHealth(): { status: string } {
+    return { status: 'ok' };
+  }
 }
