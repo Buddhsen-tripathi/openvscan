@@ -67,7 +67,7 @@ docker compose up --build
 ### API Only
 
 ```bash
-pnpm --filter api start:dev
+pnpm --filter openvscan-api start:dev
 ```
 
 - Nest CLI will provide hot reload.
@@ -76,7 +76,7 @@ pnpm --filter api start:dev
 ### Web UI Only
 
 ```bash
-pnpm --filter web dev
+pnpm --filter openvscan-web dev
 ```
 
 - Next.js dev server will proxy API requests to `localhost:5000`.
