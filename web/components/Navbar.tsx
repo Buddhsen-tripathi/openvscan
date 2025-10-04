@@ -3,12 +3,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { useTheme } from 'next-themes';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { resolvedTheme, setTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -22,7 +20,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center space-x-3 group">
             {mounted && (
               <Image
-                src={resolvedTheme === 'dark' ? '/logo-dark.png' : '/logo.png'}
+                src="/logo.png"
                 alt="OpenVScan"
                 width={36}
                 height={36}
