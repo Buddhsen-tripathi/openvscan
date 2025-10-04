@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
 
 const siteTitle = "OpenVScan – Open Vulnerability Scanner";
 const siteDescription =
@@ -43,6 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <Navbar />
       <body>{children}</body>
     </html>
   );
