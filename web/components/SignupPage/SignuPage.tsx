@@ -38,21 +38,21 @@ export default function SignUpPage() {
         <form className="space-y-5" autoComplete="off" onSubmit={(e) => { e.preventDefault(); setLoading(true); }}>
           <div>
             <input 
-              type="text"
-              required
-              placeholder="Username"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-background border border-primary/20 focus:outline-none focus:border-primary text-foreground transition-all text-base"
-            />
-          </div>
-          <div>
-            <input 
               type="email"
               required
               placeholder="Email Address"
               value={email}
               onChange={e => setEmail(e.target.value)}
+              className="w-full px-4 py-3 rounded-lg bg-background border border-primary/20 focus:outline-none focus:border-primary text-foreground transition-all text-base"
+            />
+          </div>
+          <div>
+            <input 
+              type="text"
+              required
+              placeholder="Username"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
               className="w-full px-4 py-3 rounded-lg bg-background border border-primary/20 focus:outline-none focus:border-primary text-foreground transition-all text-base"
             />
           </div>
