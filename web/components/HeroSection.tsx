@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import Navbar from './Navbar';
 
 export default function HeroSection() {
   const [scrollY, setScrollY] = useState(0);
@@ -15,6 +16,7 @@ export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-secondary">
       {/* Animated SVG Background */}
+       <Navbar />
       <div 
         className="absolute inset-0 flex items-center justify-center"
         style={{ 
