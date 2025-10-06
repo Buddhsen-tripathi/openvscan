@@ -24,7 +24,7 @@ export default function SignUpPage() {
       </div>
       
       <div className="absolute inset-0 bg-[linear-gradient(theme(colors.primary/0.01)_1px,transparent_1px),linear-gradient(90deg,theme(colors.primary/0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-      <div className="relative bg-card rounded-2xl shadow-xl border border-primary/30 w-full max-w-full md:max-w-md px-4 sm:px-6 py-6 md:py-8 mx-auto text-center z-10 animate-fade-in-up overflow-y-auto"
+      <div className="relative bg-card rounded-2xl shadow-xl border border-primary/30 w-full max-w-full sm:max-w-md px-8 sm:px-8 py-6 md:py-8 mx-auto text-center z-10 animate-fade-in-up overflow-y-auto"
            style={{ maxHeight: 'calc(100vh - 2rem)' }}
       >
         <div className="mb-6 flex items-center justify-center gap-2">
@@ -91,7 +91,7 @@ export default function SignUpPage() {
         </div>
 
         {/* Other Auth Options */}
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="flex gap-3 flex-row">
           <button className="w-full py-2 rounded-lg bg-card border border-border text-foreground font-semibold hover:bg-card-hover transition-all flex items-center justify-center gap-2 hover:cursor-pointer hover:bg-slate-200">
             <FaGoogle className="w-5 h-5 text-[#EA4335]" />
             <span className="inline xs:hidden">Google</span>

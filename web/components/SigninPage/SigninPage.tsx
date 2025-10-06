@@ -25,7 +25,7 @@ export default function SignInPage() {
       
       <div className="absolute inset-0 bg-[linear-gradient(theme(colors.primary/0.01)_1px,transparent_1px),linear-gradient(90deg,theme(colors.primary/0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
       
-      <div className="relative bg-card rounded-2xl shadow-xl border border-primary/30 w-full max-w-full md:max-w-md p-8 mx-auto text-center z-10 animate-fade-in-up">
+      <div className="relative bg-card rounded-2xl shadow-xl border border-primary/30 w-full max-w-full sm:max-w-md px-6 py-8 sm:px-8 mx-auto text-center z-10 animate-fade-in-up">
         <div className="mb-6 flex items-center justify-center gap-2">
           <Image src="/logo.png" alt="Logo" width={40} height={40} className="rounded-lg shadow shadow-primary/30" />
           <h2 className="text-2xl font-bold text-foreground">OpenVScan</h2>
@@ -88,7 +88,7 @@ export default function SignInPage() {
         </div>
         
         {/* Other Auth Options */}
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="flex gap-3 flex-row">
           <button className="w-full py-2 rounded-lg bg-card border border-border text-foreground font-semibold hover:bg-card-hover transition-all flex items-center justify-center gap-2 hover:cursor-pointer hover:bg-slate-200">
             <FaGoogle className="w-5 h-5 text-[#EA4335]" />
             <span className="inline xs:hidden">Google</span>
