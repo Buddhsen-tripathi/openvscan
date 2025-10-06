@@ -10,7 +10,7 @@ const RegisterComponent = () => {
       className="m-auto h-fit w-full max-w-sm overflow-hidden rounded-md border border-neutral-200 bg-white shadow-md shadow-zinc-950/5"
     >
       <div className="p-6">
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center gap-1">
           <Link href="/" aria-label="go home" className="block w-fit">
             <Logo width={60} height={40} />
           </Link>
