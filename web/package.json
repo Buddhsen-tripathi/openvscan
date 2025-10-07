@@ -10,8 +10,8 @@
     "format": "biome format --write",
     "cf:build": "next build && next-on-pages",
     "cf:dev": "wrangler dev .vercel/output/static/_worker.js --assets .vercel/output/static",
-    "cf:deploy": "wrangler deploy .vercel/output/static/_worker.js --assets .vercel/output/static",
-    "cf:preview": "wrangler dev .vercel/output/static/_worker.js --assets .vercel/output/static --remote"
+    "cf:deploy": "pnpm run cf:build && wrangler deploy .vercel/output/static/_worker.js --assets .vercel/output/static",
+    "cf:preview": "pnpm run cf:build && wrangler dev .vercel/output/static/_worker.js --assets .vercel/output/static --remote"
   },
   "dependencies": {
     "clsx": "^2.1.1",
