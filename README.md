@@ -15,13 +15,13 @@ OpenVScan is a web-based vulnerability scanner that integrates open-source tools
 
 ## Planned Architecture
 
-| Tier | Stack | Responsibilities |
-| --- | --- | --- |
-| UI (`web/`) | Next.js 15, React 19, Tailwind CSS | Scan setup, dashboards, reporting, multi-tenant UX |
-| API (`api/`) | NestJS 11, TypeScript, PostgreSQL ORM | Projects, auth, scan orchestration, findings API |
-| Workers | Containerized runners + message queue | Execute scanners, aggregate artifacts, stream telemetry |
-| Storage | PostgreSQL, object storage, Redis | Metadata, artifacts, coordination primitives |
-| AI Services | LLM providers | Summaries, deduplication, remediation guidance |
+| Tier         | Stack                                 | Responsibilities                                        |
+| ------------ | ------------------------------------- | ------------------------------------------------------- |
+| UI (`web/`)  | Next.js 15, React 19, Tailwind CSS    | Scan setup, dashboards, reporting, multi-tenant UX      |
+| API (`api/`) | NestJS 11, TypeScript, PostgreSQL ORM | Projects, auth, scan orchestration, findings API        |
+| Workers      | Containerized runners + message queue | Execute scanners, aggregate artifacts, stream telemetry |
+| Storage      | PostgreSQL, object storage, Redis     | Metadata, artifacts, coordination primitives            |
+| AI Services  | LLM providers                         | Summaries, deduplication, remediation guidance          |
 
 ## Repository Layout
 
@@ -84,6 +84,46 @@ pnpm --filter openvscan-web dev
 ```
 
 - Next.js dev server will proxy API requests to `localhost:5000`.
+
+## Formatting the code
+
+We enforce consistent code style across the repository using [Prettier](https://prettier.io/) for both the API (`api/`) and Web (`web/`) projects.
+
+### Setup
+
+1. **Install the Prettier VS Code extension:**  
+   Search for `esbenp.prettier-vscode` in the Extensions panel and install it.
+
+2. **Workspace Formatting Settings:**  
+   The repository includes a recommended VS Code settings file at `.vscode/settings.json`:
+
+   ```json
+   {
+     "editor.defaultFormatter": "esbenp.prettier-vscode",
+     "editor.formatOnSave": true,
+     "editor.codeActionsOnSave": {
+       "source.fixAll.eslint": true
+     },
+     "eslint.validate": [
+       "javascript",
+       "typescript",
+       "typescriptreact",
+       "javascriptreact"
+     ]
+   }
+   ```
+
+   - This ensures Prettier is used as the default formatter and formats code automatically on save.
+   - ESLint fixes are also applied on save for supported file types.
+
+3. **Manual Formatting:**  
+   You can manually format your codebase by running:
+
+   ```bash
+   pnpm format
+   ```
+
+> Please ensure your code is formatted before committing. Formatting is enforced in CI.
 
 ## Usage (Vision)
 
