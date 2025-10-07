@@ -1,5 +1,4 @@
 name = "openvscan-web"
-main = ".vercel/output/static/_worker.js"
 compatibility_date = "2025-10-07"
 compatibility_flags = ["nodejs_compat"]
 
@@ -11,3 +10,11 @@ assets = { directory = ".vercel/output/static", binding = "ASSETS" }
 
 # Non-public secrets should be added via:
 #   wrangler secret put MY_SECRET
+
+[build]
+command = "pnpm run cf:build"
+
+[build.upload]
+format = "modules"
+dir = ".vercel/output/static/_worker.js"
+main = "index.js"
