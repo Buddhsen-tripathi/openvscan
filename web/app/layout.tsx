@@ -37,6 +37,11 @@ export const metadata: Metadata = {
     title: siteTitle,
     description: siteDescription,
   },
+  icons: {
+    icon: [
+      { url: "/logo.png", type: "image/png" },
+    ],
+  }
 };
 
 export default function RootLayout({
@@ -46,7 +51,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-     
+      <Navbar />
       <body>{children}</body>
     </html>
   );

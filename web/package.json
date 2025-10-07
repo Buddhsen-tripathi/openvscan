@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write",
-    "cf:build": "next build && next-on-pages",
+  "cf:build": "next build && next-on-pages && node -e \"require('fs').mkdirSync('.vercel/output/static',{recursive:true}); require('fs').writeFileSync('.vercel/output/static/.assetsignore','_worker.js\\n')\"",
     "cf:dev": "wrangler dev .vercel/output/static/_worker.js --assets .vercel/output/static",
     "cf:deploy": "pnpm run cf:build && wrangler deploy .vercel/output/static/_worker.js --assets .vercel/output/static",
     "cf:preview": "pnpm run cf:build && wrangler dev .vercel/output/static/_worker.js --assets .vercel/output/static --remote"

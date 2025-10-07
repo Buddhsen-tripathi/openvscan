@@ -1,8 +1,9 @@
 name = "openvscan-web"
+main = ".vercel/output/static/_worker.js/index.js"
 compatibility_date = "2025-10-07"
 compatibility_flags = ["nodejs_compat"]
 
-assets = { directory = ".vercel/output/static", binding = "ASSETS" }
+assets = { directory = ".vercel/output/static" }
 
 [vars]
 # NEXT_PUBLIC_* variables are readable on the client
@@ -13,8 +14,3 @@ assets = { directory = ".vercel/output/static", binding = "ASSETS" }
 
 [build]
 command = "pnpm run cf:build"
-
-[build.upload]
-format = "modules"
-dir = ".vercel/output/static/_worker.js"
-main = "index.js"
