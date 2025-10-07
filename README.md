@@ -8,6 +8,10 @@ OpenVScan is a web-based vulnerability scanner that integrates open-source tools
 [![GitHub issues](https://img.shields.io/github/issues/Buddhsen-tripathi/openvscan.svg)](https://github.com/Buddhsen-tripathi/openvscan/issues)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/Buddhsen-tripathi/openvscan/actions)
 
+## Links
+
+- Join the waitlist: https://openvscan.com
+- Dev preview: https://openvscan-web.buddhsen-work.workers.dev/
 
 ## Planned Architecture
 
