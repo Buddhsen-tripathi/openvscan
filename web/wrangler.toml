@@ -1,16 +1,11 @@
 name = "openvscan-web"
-main = ".vercel/output/static/_worker.js/index.js"
+main = ".open-next/worker.js"
 compatibility_date = "2025-10-07"
 compatibility_flags = ["nodejs_compat"]
 
-assets = { directory = ".vercel/output/static" }
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
 
-[vars]
-# NEXT_PUBLIC_* variables are readable on the client
-# NEXT_PUBLIC_API_BASE = "https://api.example.com"
-
-# Non-public secrets should be added via:
-#   wrangler secret put MY_SECRET
-
-[build]
-command = "pnpm run cf:build"
+[observability.logs]
+enabled = true
