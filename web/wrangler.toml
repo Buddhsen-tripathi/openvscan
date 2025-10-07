@@ -1,0 +1,13 @@
+name = "openvscan-web"
+main = ".vercel/output/static/_worker.js"
+compatibility_date = "2025-10-07"
+compatibility_flags = ["nodejs_compat"]
+
+assets = { directory = ".vercel/output/static", binding = "ASSETS" }
+
+[vars]
+# NEXT_PUBLIC_* variables are readable on the client
+# NEXT_PUBLIC_API_BASE = "https://api.example.com"
+
+# Non-public secrets should be added via:
+#   wrangler secret put MY_SECRET

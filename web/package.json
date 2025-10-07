@@ -7,7 +7,11 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "biome check",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "cf:build": "next build && next-on-pages",
+    "cf:dev": "wrangler dev .vercel/output/static/_worker.js --assets .vercel/output/static",
+    "cf:deploy": "wrangler deploy .vercel/output/static/_worker.js --assets .vercel/output/static",
+    "cf:preview": "wrangler dev .vercel/output/static/_worker.js --assets .vercel/output/static --remote"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -24,6 +28,9 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@cloudflare/next-on-pages": "^1.13.4",
+    "wrangler": "^4.42.0",
+    "vercel": "47.0.4"
   }
 }
