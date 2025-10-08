@@ -1,6 +1,7 @@
 import Widget from './Widget';
 import WelcomeBanner from './WelcomeBanner';
 
+
 export default function DashboardPage() {
   return (
     <div className="flex h-screen bg-gray-100 text-gray-800">

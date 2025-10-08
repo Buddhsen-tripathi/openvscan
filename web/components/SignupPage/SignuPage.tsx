@@ -4,55 +4,120 @@ import Link from 'next/link';
 import { useState } from 'react';
 import Image from 'next/image';
 import { FaGoogle, FaGithub } from 'react-icons/fa';
-
+import { authClient } from '@/lib/auth-client';
 export default function SignUpPage() {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    await authClient.signIn.email({
+      email,
+      password,
+    });
+  };
+
+  const handleSignup = async () => {
+    await authClient.signUp.email({
+      email,
+      password,
+      name: username,
+    });
+  };
 
   return (
     <section className="p-4 min-h-screen flex items-center justify-center bg-secondary relative overflow-hidden py-8">
       {/* Animated SVG Rings */}
-      <div className="absolute inset-0 flex items-center justify-center blur-sm pointer-events-none" style={{ opacity: 0.12 }}>
-        <svg viewBox="0 0 200 200" width={500} height={500} className="w-[70vw] h-[70vw] max-w-[600px] max-h-[600px] min-w-[280px] min-h-[280px]" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="100" cy="100" r="90" fill="none" stroke="var(--color-primary)" strokeWidth="0.7" opacity="0.25" />
-          <circle cx="100" cy="100" r="70" fill="none" stroke="var(--color-primary)" strokeWidth="0.5" opacity="0.3" />
-          <circle cx="100" cy="100" r="80" fill="var(--color-background)" stroke="var(--color-primary)" strokeWidth="1" opacity="0.08"/>
+      <div
+        className="absolute inset-0 flex items-center justify-center blur-sm pointer-events-none"
+        style={{ opacity: 0.12 }}
+      >
+        <svg
+          viewBox="0 0 200 200"
+          width={500}
+          height={500}
+          className="w-[70vw] h-[70vw] max-w-[600px] max-h-[600px] min-w-[280px] min-h-[280px]"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="100"
+            cy="100"
+            r="90"
+            fill="none"
+            stroke="var(--color-primary)"
+            strokeWidth="0.7"
+            opacity="0.25"
+          />
+          <circle
+            cx="100"
+            cy="100"
+            r="70"
+            fill="none"
+            stroke="var(--color-primary)"
+            strokeWidth="0.5"
+            opacity="0.3"
+          />
+          <circle
+            cx="100"
+            cy="100"
+            r="80"
+            fill="var(--color-background)"
+            stroke="var(--color-primary)"
+            strokeWidth="1"
+            opacity="0.08"
+          />
         </svg>
       </div>
-      
+
       <div className="absolute inset-0 bg-[linear-gradient(theme(colors.primary/0.01)_1px,transparent_1px),linear-gradient(90deg,theme(colors.primary/0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-      <div className="relative bg-card rounded-2xl shadow-xl border border-primary/30 w-full max-w-full sm:max-w-md px-8 sm:px-8 py-6 md:py-8 mx-auto text-center z-10 animate-fade-in-up overflow-y-auto"
-           style={{ maxHeight: 'calc(100vh - 2rem)' }}
+      <div
+        className="relative bg-card rounded-2xl shadow-xl border border-primary/30 w-full max-w-full sm:max-w-md px-8 sm:px-8 py-6 md:py-8 mx-auto text-center z-10 animate-fade-in-up overflow-y-auto"
+        style={{ maxHeight: 'calc(100vh - 2rem)' }}
       >
         <div className="mb-6 flex items-center justify-center gap-2">
-          <Image src="/logo.png" alt="Logo" width={36} height={36} className="rounded-lg shadow shadow-primary/30" priority />
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={36}
+            height={36}
+            className="rounded-lg shadow shadow-primary/30"
+            priority
+          />
           <h2 className="text-2xl font-bold text-foreground">OpenVScan</h2>
         </div>
         <h3 className="mb-2 text-xl font-semibold text-primary">Create your account</h3>
-        <p className="mb-6 text-sm text-muted-foreground">Sign up to secure your code before it ships.</p>
-        
-        {/* Form */} 
-        <form className="space-y-5" autoComplete="off" onSubmit={(e) => { e.preventDefault(); setLoading(true); }}>
+        <p className="mb-6 text-sm text-muted-foreground">
+          Sign up to secure your code before it ships.
+        </p>
+
+        {/* Form */}
+        <form
+          className="space-y-5"
+          autoComplete="off"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setLoading(true);
+          }}
+        >
           <div>
-            <input 
+            <input
               type="email"
               required
               placeholder="Email Address"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 rounded-lg bg-background border border-primary/20 focus:outline-none focus:border-primary text-foreground transition-all text-base"
             />
           </div>
           <div>
-            <input 
+            <input
               type="text"
               required
               placeholder="Username"
               value={username}
-              onChange={e => setUsername(e.target.value)}
+              onChange={(e) => setUsername(e.target.value)}
               className="w-full px-4 py-3 rounded-lg bg-background border border-primary/20 focus:outline-none focus:border-primary text-foreground transition-all text-base"
             />
           </div>
@@ -62,7 +127,7 @@ export default function SignUpPage() {
               required
               placeholder="Password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 rounded-lg bg-background border border-primary/20 focus:outline-none focus:border-primary text-foreground transition-all pr-10 text-base"
             />
             <button
@@ -103,7 +168,9 @@ export default function SignUpPage() {
         </div>
         <p className="mt-6 text-xs text-muted-foreground">
           Already have an account?{' '}
-          <Link href="/signin" className="text-primary hover:underline">Sign in</Link>
+          <Link href="/login" className="text-primary hover:underline">
+            Sign in
+          </Link>
         </p>
       </div>
     </section>
