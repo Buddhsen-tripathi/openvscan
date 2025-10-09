@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Star } from 'lucide-react';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,67 +14,76 @@ export default function Navbar() {
     setMounted(true);
   }, []);
 
-
+  // Grouping navigation links for better organization
   const navLinks = [
-    { href: "/features", label: "Features" },
+    { href: "/#features", label: "Features" },
     { href: "/docs", label: "Docs" },
-    { href: "/roadmap", label: "Roadmap" },
-    { href: "https://github.com/Buddhsen-tripathi/openvscan", label: "GitHub", external: true }
   ];
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-nav-background border-b border-border transition-all duration-300`}>
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-3 group">
+            <Link href="/" className="flex items-center space-x-3">
               {mounted ? (
                 <Image
                   src="/logo.png"
                   alt="OpenVScan"
                   priority
-                  width={36}
-                  height={36}
-                  className="transition-transform group-hover:scale-110 group-hover:rotate-6 duration-300"
+                  width={32}
+                  height={32}
+                  className="rounded-md"
                 />
               ) : (
-                <div className="w-9 h-9 bg-gray-200 dark:bg-gray-800 rounded animate-pulse" />
+                <div className="w-8 h-8 bg-muted rounded-md" />
               )}
-              <span className="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
+              <span className="text-xl font-semibold text-foreground">
                 OpenVScan
               </span>
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-1">
-              {navLinks.map(({ href, label, external }) => (
+            <div className="hidden md:flex items-center gap-8">
+              {/* Standard Links */}
+              <div className="flex items-center gap-6">
+                {navLinks.map(({ href, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Divider and Action Buttons */}
+              <div className="flex items-center gap-4">
+                <div className="w-px h-6 bg-border" />
                 <Link
-                  key={href}
-                  href={href}
-                  target={external ? "_blank" : undefined}
-                  rel={external ? "noopener noreferrer" : undefined}
-                  className="px-4 py-2 text-sm text-nav-text hover:text-primary hover:bg-primary/5 rounded-lg transition-all duration-200"
+                  href="https://github.com/Buddhsen-tripathi/openvscan"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {label}
+                  <Star className="w-4 h-4 mr-2" />
+                  Star on GitHub
                 </Link>
-              ))}
-              <Link
-                href="/signin"
-                className="ml-4 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30 transition-all duration-200 text-sm font-medium"
-              >
-                Get Started
-              </Link>
+                <Button asChild size="sm">
+                  <Link href="/signin">Get Started</Link>
+                </Button>
+              </div>
             </div>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden text-nav-text hover:text-primary transition-colors p-2 rounded-lg hover:bg-primary/5"
+              className="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Toggle menu"
-              aria-expanded={isMenuOpen}
             >
-              <svg className="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isMenuOpen ? (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 ) : (
@@ -83,44 +94,44 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu */}
-          <div
-            className={`flex flex-col md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-              isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-            }`}
-          >
-            <div className="py-4 space-y-2 border-t border-border items-center">
-              {navLinks.map(({ href, label, external }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  target={external ? "_blank" : undefined}
-                  rel={external ? "noopener noreferrer" : undefined}
-                  className="block px-4 py-2 text-nav-text hover:text-primary hover:bg-primary/5 rounded-lg transition-all duration-200 text-sm"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {label}
-                </Link>
-              ))}
-              <Link
-                href="/signin"
-                className="block mx-4 mt-4 px-5 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all duration-200 text-sm font-medium text-center shadow-lg shadow-primary/30"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Get Started
-              </Link>
+          {isMenuOpen && (
+            <div className="md:hidden py-4 border-t border-border">
+              <div className="space-y-2">
+                {navLinks.map(({ href, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {label}
+                  </Link>
+                ))}
+                 <Link
+                    href="https://github.com/Buddhsen-tripathi/openvscan"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Star className="w-4 h-4 mr-2" />
+                    Star on GitHub
+                  </Link>
+                <div className="px-4 pt-2">
+                  <Button asChild className="w-full">
+                    <Link href="/signin" onClick={() => setIsMenuOpen(false)}>
+                      Get Started
+                    </Link>
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </nav>
 
-      {/* Mobile Menu Backdrop */}
-      {isMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
-          onClick={() => setIsMenuOpen(false)}
-          aria-hidden="true"
-        />
-      )}
+      {/* Spacer for fixed navbar */}
+      <div className="h-16" />
     </>
   );
 }
