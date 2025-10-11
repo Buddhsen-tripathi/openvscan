@@ -61,7 +61,6 @@ async function bootstrap() {
 }
 
 function setupSwaggerDocumentation(app: INestApplication) {
-  // console.log(process);
   const title = process.env.npm_package_name || 'OpenVScan API';
   const description =
     process.env.npm_package_description ||

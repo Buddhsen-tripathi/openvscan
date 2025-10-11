@@ -34,7 +34,7 @@ export class ScanRequestDto {
   })
   @IsOptional()
   @IsString()
-  @Matches(/^(\d+\.)?(\d+\.)?(\*|\d+)$/, {
+  @Matches(/^\d+\.\d+\.\d+$/, {
     message: 'version must follow semantic versioning (e.g., 1.2.3)',
   })
   version?: string;
