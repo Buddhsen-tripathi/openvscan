@@ -1,17 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/exception.filter';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { ValidationPipe, Logger, INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as dotenv from 'dotenv';
+import { ConfigService } from '@nestjs/config';
+// import * as dotenv from 'dotenv';
 
-dotenv.config();
+// dotenv.config();
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
   });
+
+  const configService = app.get(ConfigService);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -23,9 +26,11 @@ async function bootstrap() {
 
   // CORS configuration
   try {
-    const allowedOrigins = process.env.FRONTEND_URL;
+    const allowedOrigins = configService.get<string>('FRONTEND_URL');
     if (!allowedOrigins) {
-      throw new Error('FRONTEND_URL environment variable is required to configure CORS.');
+      throw new Error(
+        'FRONTEND_URL environment variable is required to configure CORS.',
+      );
     }
 
     app.enableCors({
@@ -43,15 +48,29 @@ async function bootstrap() {
   // Global exception filter
   app.useGlobalFilters(new GlobalExceptionFilter());
 
-  // Swagger configuration
-  const config = new DocumentBuilder()
-    .setTitle('OpenVScan API')
-    .setDescription(
-      'OpenVScan API documentation - A vulnerability scanning platform that combines open-source scanners with AI-assisted analysis',
-    )
-    .setVersion('1.0')
-    .addTag('health', 'Health check endpoints')
-    .addTag('scan', 'Vulnerability scanning endpoints')
+  // Swagger documentation
+  setupSwaggerDocumentation(app);
+
+  const port = configService.get<number>('PORT') ?? 3000;
+  await app.listen(port);
+
+  logger.log(`Application is running on: http://localhost:${port}`);
+  logger.log(
+    `Swagger documentation available at: http://localhost:${port}/api/docs`,
+  );
+}
+
+function setupSwaggerDocumentation(app: INestApplication) {
+  const title = process.env.npm_package_name || 'OpenVScan API';
+  const description =
+    process.env.npm_package_description ||
+    'OpenVScan API documentation - A vulnerability scanning platform that combines open-source scanners with AI-assisted analysis';
+  const version = process.env.npm_package_version || '1.0';
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle(title)
+    .setDescription(description)
+    .setVersion(version)
     .addBearerAuth(
       {
         type: 'http',
@@ -63,18 +82,15 @@ async function bootstrap() {
     )
     .build();
 
-  const document = SwaggerModule.createDocument(app as any, config);
-  SwaggerModule.setup('api/docs', app as any, document, {
-    customSiteTitle: 'OpenVScan API Docs',
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, document, {
+    customSiteTitle: `${title} docs`,
     customfavIcon: 'https://nestjs.com/img/logo-small.svg',
     customCss: '.swagger-ui .topbar { display: none }',
+    swaggerOptions: {
+      persistAuthorization: true, // ✅ Keeps JWT token even after refresh
+    },
   });
-
-  const port = process.env.PORT ?? 3000;
-  await app.listen(port);
-
-  logger.log(`Application is running on: http://localhost:${port}`);
-  logger.log(`Swagger documentation available at: http://localhost:${port}/api/docs`);
 }
 
 bootstrap();

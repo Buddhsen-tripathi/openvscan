@@ -1,28 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { ScanRequestDto, ScanType } from './dto/scan-request.dto';
-
-export interface Vulnerability {
-  package: string;
-  version: string;
-  severity: 'critical' | 'high' | 'medium' | 'low';
-  cve: string;
-  description: string;
-  fix: string;
-}
-
-export interface ScanResult {
-  scanId: string;
-  timestamp: string;
-  target: string;
-  vulnerabilities: Vulnerability[];
-  summary: {
-    critical: number;
-    high: number;
-    medium: number;
-    low: number;
-    total: number;
-  };
-}
+import { ScanRequestDto } from './dto/scan-request.dto';
+import { ScanResult, Vulnerability, ScanType } from './types';
 
 @Injectable()
 export class ScanService {
