@@ -11,7 +11,7 @@ export default function HeroSection() {
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-background text-foreground">
 
       {/* WebGL Threads Background */}
-      <div className="absolute inset-0 z-0 opacity-40 dark:opacity-20">
+      <div className="absolute inset-0 z-0 opacity-20">
         <Suspense fallback={<div className="w-full h-full bg-background" />}>
           <Threads
             color={[0.3, 0.5, 0.9]}
