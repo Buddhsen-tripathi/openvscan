@@ -4,14 +4,12 @@ import { GlobalExceptionFilter } from './common/exception.filter';
 import { ValidationPipe, Logger, INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
-// import * as dotenv from 'dotenv';
-
-// dotenv.config();
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+    bodyParser: false,
   });
 
   const configService = app.get(ConfigService);
@@ -60,7 +58,7 @@ async function bootstrap() {
   );
 }
 
-function setupSwaggerDocumentation(app: INestApplication) {
+export function setupSwaggerDocumentation(app: INestApplication) {
   const title = process.env.npm_package_name || 'OpenVScan API';
   const description =
     process.env.npm_package_description ||
@@ -71,15 +69,7 @@ function setupSwaggerDocumentation(app: INestApplication) {
     .setTitle(title)
     .setDescription(description)
     .setVersion(version)
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        description: 'Enter JWT token',
-      },
-      'JWT-auth',
-    )
+    .addCookieAuth('better-auth.session_token')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
@@ -88,7 +78,7 @@ function setupSwaggerDocumentation(app: INestApplication) {
     customfavIcon: 'https://nestjs.com/img/logo-small.svg',
     customCss: '.swagger-ui .topbar { display: none }',
     swaggerOptions: {
-      persistAuthorization: true, // ✅ Keeps JWT token even after refresh
+      persistAuthorization: true,
     },
   });
 }
