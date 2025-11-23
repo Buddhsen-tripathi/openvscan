@@ -10,13 +10,19 @@ export default function DashboardPage() {
         <nav>
           <ul>
             <li className="mb-4">
-              <a href="/dashboard" className="font-bold text-blue-500">Dashboard</a>
+              <a href="/dashboard" className="font-bold text-blue-500">
+                Dashboard
+              </a>
             </li>
             <li className="mb-4">
-              <a href="#" className="hover:text-blue-500">Scans</a>
+              <a href="#" className="hover:text-blue-500">
+                Scans
+              </a>
             </li>
             <li className="mb-4">
-              <a href="#" className="hover:text-blue-500">Reports</a>
+              <a href="#" className="hover:text-blue-500">
+                Reports
+              </a>
             </li>
           </ul>
         </nav>
@@ -35,23 +41,23 @@ export default function DashboardPage() {
 
         {/* Page Content */}
         <main className="flex-1 p-6">
-  <WelcomeBanner />
+          <WelcomeBanner />
 
-  {/* Add a grid for your widgets */}
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-    <Widget title="Recent Scans">
-      <p className="text-gray-500">No recent scans. Start one now!</p>
-    </Widget>
-    <Widget title="Onboarding Status">
-      <p className="text-gray-500">Your profile is 75% complete.</p>
-    </Widget>
-    <Widget title="Quick Actions">
-      <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-        + New Scan
-      </button>
-    </Widget>
-  </div>
-</main>
+          {/* Add a grid for your widgets */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            <Widget title="Recent Scans">
+              <p className="text-gray-500">No recent scans. Start one now!</p>
+            </Widget>
+            <Widget title="Onboarding Status">
+              <p className="text-gray-500">Your profile is 75% complete.</p>
+            </Widget>
+            <Widget title="Quick Actions">
+              <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                + New Scan
+              </button>
+            </Widget>
+          </div>
+        </main>
       </div>
     </div>
   );

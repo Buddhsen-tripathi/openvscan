@@ -1,60 +1,69 @@
 'use client';
 
 import Link from 'next/link';
-import { Suspense } from 'react';
-import Threads from './Threads';
-import { Button } from '@/components/ui/button';
-import { Star } from 'lucide-react';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { Marquee } from '@/components/ui/Marquee';
+import { SplitText, BlurText } from '@/components/ui/TextAnimations';
+import SpotlightButton from '@/components/ui/SpotlightButton';
+import ColorBends from '@/components/ui/ColorBends';
+import { Shield, Zap, Code2, Lock, Terminal, Database } from 'lucide-react';
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-background text-foreground">
-
-      {/* WebGL Threads Background */}
-      <div className="absolute inset-0 z-0 opacity-20">
-        <Suspense fallback={<div className="w-full h-full bg-background" />}>
-          <Threads
-            color={[0.3, 0.5, 0.9]}
-            amplitude={0.8}
-            distance={0.2}
-            enableMouseInteraction={true}
-          />
-        </Suspense>
+    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden pt-20 md:pt-32 pb-20 bg-background">
+      {/* Background Effect */}
+      <div className="absolute inset-0 z-0 opacity-40">
+        <ColorBends />
       </div>
 
-      <div className="absolute inset-0 bg-[linear-gradient(theme(colors.primary/0.03)_1px,transparent_1px),linear-gradient(90deg,theme(colors.primary/0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+      <div className="w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary mb-8 backdrop-blur-md"
+        >
+          <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
+          Now in Public Beta
+        </motion.div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex-grow flex flex-col justify-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-primary text-sm font-medium mb-8 animate-fade-in mx-auto">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-          </span>
-          Work in Progress
+        <div className="mx-auto max-w-5xl mb-8">
+          <SplitText
+            text="Secure Your Code Before Production"
+            className="text-4xl font-bold tracking-tighter text-foreground sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-[1.1] justify-center"
+            delay={0.1}
+          />
         </div>
 
-        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold mb-6 text-foreground animate-fade-in-up">
-          Secure Your Code
-          <br />
-          <span className="text-primary">Before It Ships</span>
-        </h1>
+        <BlurText
+          text="OpenVScan combines open-source scanners with AI-assisted analysis for faster, more reliable pre-production testing. Find and fix vulnerabilities before they ship."
+          className="mx-auto max-w-2xl text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-8 md:mb-12 leading-relaxed"
+          delay={0.8}
+          duration={1}
+        />
 
-        <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-          Combines proven open-source security scanners with AI-driven analysis for smarter, faster pre-production testing.
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-          <Button asChild size="lg" className="shadow-lg shadow-primary/20">
-            <Link href="/signin">Get Started</Link>
-          </Button>
-          <Button asChild variant="outline" size="lg">
-            <Link href="https://github.com/Buddhsen-tripathi/openvscan" target="_blank" rel="noopener noreferrer">
-              <Star className="w-4 h-4 mr-2" />
-              Star on GitHub
-            </Link>
-          </Button>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 1.2 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-16 md:mb-24"
+        >
+          <SpotlightButton
+            as={Link}
+            href="/signin"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 border-transparent"
+          >
+            Start Free Scan
+          </SpotlightButton>
+          <SpotlightButton
+            as={Link}
+            href="https://github.com/Buddhsen-tripathi/openvscan"
+            className="hover:bg-muted/10"
+          >
+            View on GitHub
+          </SpotlightButton>
+        </motion.div>
       </div>
     </section>
   );

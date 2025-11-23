@@ -43,9 +43,7 @@ export default function Footer() {
                 height={32}
                 className="rounded-md"
               />
-              <span className="text-xl font-semibold text-foreground">
-                OpenVScan
-              </span>
+              <span className="text-xl font-semibold text-foreground">OpenVScan</span>
             </Link>
             <p className="text-sm text-muted-foreground">
               Smarter, faster pre-production security testing.
@@ -58,7 +56,10 @@ export default function Footer() {
             <ul className="space-y-3">
               {footerNav.product.map((item) => (
                 <li key={item.label}>
-                  <Link href={item.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link
+                    href={item.href}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
                     {item.label}
                   </Link>
                 </li>
@@ -70,7 +71,12 @@ export default function Footer() {
             <ul className="space-y-3">
               {footerNav.community.map((item) => (
                 <li key={item.label}>
-                  <Link href={item.href} target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
                     {item.label}
                   </Link>
                 </li>
@@ -82,7 +88,10 @@ export default function Footer() {
             <ul className="space-y-3">
               {footerNav.company.map((item) => (
                 <li key={item.label}>
-                  <Link href={item.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  <Link
+                    href={item.href}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
                     {item.label}
                   </Link>
                 </li>

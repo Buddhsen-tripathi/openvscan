@@ -1,250 +1,263 @@
 'use client';
 
-import { motion, Variants } from "framer-motion";
-import { BrainCircuit, CheckCircle, Search, User, Database, Globe, Loader2, ArrowRight, FileText, ShieldCheck, Zap } from "lucide-react";
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import {
+  Shield,
+  Zap,
+  Search,
+  FileCode,
+  CheckCircle2,
+  AlertTriangle,
+  Bug,
+  GitBranch,
+  Package,
+  Loader2,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-const getToolIcon = (type: string) => {
-    switch (type) {
-        case 'internal_service':
-            return <Database className="w-3 h-3" />;
-        case 'web_search':
-            return <Globe className="w-3 h-3" />;
-        default:
-            return <Search className="w-3 h-3" />;
-    }
-};
+const scanningSteps = [
+  {
+    id: 1,
+    title: 'Connect Repo / Upload Zip',
+    description: 'Connect repository or upload zip file',
+    icon: FileCode,
+    status: 'completed',
+    duration: '2s',
+  },
+  {
+    id: 2,
+    title: 'AI Analysis',
+    description: 'AI scans for vulnerabilities',
+    icon: Search,
+    status: 'running',
+    duration: '15s',
+  },
+  {
+    id: 3,
+    title: 'Dependency Check',
+    description: 'Scan third-party packages',
+    icon: Package,
+    status: 'pending',
+    duration: '8s',
+  },
+  {
+    id: 4,
+    title: 'Security Report',
+    description: 'Generate detailed findings',
+    icon: Shield,
+    status: 'pending',
+    duration: '5s',
+  },
+];
 
-const getToolColor = (type: string) => {
-    switch (type) {
-        case 'internal_service':
-            return 'text-blue-600 bg-blue-100 border-blue-200';
-        case 'web_search':
-            return 'text-green-600 bg-green-100 border-green-200';
-        default:
-            return 'text-gray-600 bg-gray-100 border-gray-200';
-    }
-};
-
-const toolsUsed = [
-    { name: "Vulnerability Scanner", type: "internal_service" },
-    { name: "Code Analysis", type: "web_search" },
-    { name: "Dependency Check", type: "internal_service" },
+const mockResults = [
+  { type: 'critical', count: 2, description: 'SQL Injection vulnerabilities' },
+  { type: 'high', count: 5, description: 'Cross-site scripting issues' },
+  { type: 'medium', count: 12, description: 'Insecure dependencies' },
+  { type: 'low', count: 8, description: 'Code quality improvements' },
 ];
 
 export default function FeatureShowcaseSection() {
-    const containerVariants: Variants = {
-        hidden: { opacity: 1 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 1.5,
-            }
-        }
-    };
+  const [currentStep, setCurrentStep] = useState(2);
+  const [isScanning, setIsScanning] = useState(false);
 
-    const itemVariants: Variants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] } }
-    };
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.3,
+      },
+    },
+  };
 
-    const toolContainerVariants: Variants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                delayChildren: 0.5,
-                staggerChildren: 0.3,
-            }
-        }
-    };
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
 
-    const toolItemVariants: Variants = {
-        hidden: { opacity: 0, x: -10 },
-        visible: { opacity: 1, x: 0, transition: { duration: 0.4 } }
-    };
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+      case 'running':
+        return <Loader2 className="w-5 h-5 text-primary animate-spin" />;
+      default:
+        return <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/20" />;
+    }
+  };
 
-    return (
-        <section className="py-28 px-4 bg-background overflow-hidden">
-            <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-                <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, amount: 0.4 }}
-                    variants={containerVariants}
-                    className="bg-card border border-border rounded-xl p-4 lg:p-6 shadow-lg min-h-[450px]"
-                >
-                    <div className="h-8 bg-muted rounded-t-lg flex items-center px-4 border-b border-border">
-                        <div className="flex space-x-2">
-                            <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                            <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                            <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                        </div>
-                        <p className="text-xs text-muted-foreground ml-auto font-mono">Security Analysis</p>
-                    </div>
-                    <div className="p-4 lg:p-6 space-y-4">
-                        {/* Animated File Upload */}
-                        <motion.div 
-                            variants={itemVariants} 
-                            className="flex items-start gap-3 justify-end"
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.5 }}
-                        >
-                            <div className="bg-primary p-3 rounded-lg w-fit max-w-sm">
-                                <p className="text-primary-foreground font-mono text-sm">Please analyze my application code for security issues.</p>
-                            </div>
-                            <User className="h-7 w-7 text-muted-foreground mt-1 p-1 bg-muted rounded-full flex-shrink-0" />
-                        </motion.div>
+  const getSeverityColor = (type: string) => {
+    switch (type) {
+      case 'critical':
+        return 'text-red-500 bg-red-500/10 border-red-500/20';
+      case 'high':
+        return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
+      case 'medium':
+        return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
+      default:
+        return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+    }
+  };
 
-                        {/* Animated File Drop */}
-                        <motion.div 
-                            variants={itemVariants} 
-                            className="flex items-start gap-3"
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.5, delay: 0.3 }}
-                        >
-                            <div className="relative">
-                                <motion.div 
-                                    className="h-7 w-7 text-primary mt-1 p-1 bg-primary/20 rounded-full flex-shrink-0"
-                                    animate={{ 
-                                        y: [0, -5, 0],
-                                    }}
-                                    transition={{ 
-                                        duration: 1.5,
-                                        repeat: Infinity,
-                                        repeatType: "reverse"
-                                    }}
-                                >
-                                    <FileText className="h-5 w-5" />
-                                </motion.div>
-                            </div>
-                            <div className="bg-muted border border-border rounded-lg w-full p-3 space-y-3">
-                                <p className="text-foreground font-mono text-sm">Uploading application files...</p>
-                                <div className="flex items-center gap-2">
-                                    <motion.div 
-                                        className="h-2 bg-primary rounded-full"
-                                        initial={{ width: 0 }}
-                                        animate={{ width: "100%" }}
-                                        transition={{ duration: 1.5, delay: 0.5 }}
-                                    />
-                                </div>
-                            </div>
-                        </motion.div>
+  return (
+    <section className="py-24 px-4 bg-background relative">
+      <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] pointer-events-none" />
 
-                        {/* Animated Analysis Process */}
-                        <motion.div 
-                            variants={itemVariants} 
-                            className="flex items-start gap-3"
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.5, delay: 1 }}
-                        >
-                            <BrainCircuit className="h-7 w-7 text-primary mt-1 p-1 bg-primary/20 rounded-full flex-shrink-0" />
-                            <div className="bg-muted border border-border rounded-lg w-full p-3 space-y-3">
-                                <p className="text-foreground font-mono text-sm">Analyzing code for vulnerabilities...</p>
-                                <motion.div
-                                    variants={toolContainerVariants}
-                                    className="space-y-2"
-                                >
-                                    <p className="text-xs text-muted-foreground font-medium">Tools:</p>
-                                    {toolsUsed.map((tool, index) => (
-                                        <motion.div 
-                                            key={tool.name} 
-                                            variants={toolItemVariants} 
-                                            className={`flex items-center gap-2 text-xs border rounded-md px-2 py-1 w-fit ${getToolColor(tool.type)}`}
-                                            initial={{ opacity: 0, x: -10 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ duration: 0.4, delay: 1.2 + index * 0.2 }}
-                                        >
-                                            <Loader2 className="w-3 h-3 animate-spin" />
-                                            {getToolIcon(tool.type)}
-                                            <span>Running {tool.name}...</span>
-                                        </motion.div>
-                                    ))}
-                                </motion.div>
-                            </div>
-                        </motion.div>
+      <div className="max-w-7xl mx-auto relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-tight">
+            See It In
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent-foreground">
+              {' '}
+              Action
+            </span>
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Watch how our AI-powered security scanner analyzes your code in real-time and provides
+            actionable insights.
+          </p>
+        </motion.div>
 
-                        {/* Animated Report Generation */}
-                        <motion.div 
-                            variants={itemVariants} 
-                            className="flex items-start gap-3"
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.5, delay: 2.5 }}
-                        >
-                            <CheckCircle className="h-7 w-7 text-primary mt-1 p-1 bg-primary/20 rounded-full flex-shrink-0" />
-                            <div className="bg-primary/10 border border-primary/30 rounded-lg w-full p-3">
-                                <p className="text-foreground font-mono text-sm">Security analysis complete. Generating report...</p>
-                                <div className="mt-3 border-t border-primary/30 pt-2 flex items-center gap-2 text-xs text-primary">
-                                    <CheckCircle className="w-3 h-3" />
-                                    <span>Report Generated</span>
-                                </div>
-                                
-                                {/* Animated Report Preview */}
-                                <motion.div 
-                                    className="mt-3 p-2 bg-card border border-border rounded text-xs"
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    transition={{ duration: 0.5, delay: 3 }}
-                                >
-                                    <div className="flex justify-between mb-1">
-                                        <span className="font-medium">Vulnerabilities:</span>
-                                        <span className="text-red-600 font-bold">3 Critical</span>
-                                    </div>
-                                    <div className="flex justify-between mb-1">
-                                        <span className="font-medium">Security Issues:</span>
-                                        <span className="text-orange-600 font-bold">7 High</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="font-medium">Best Practices:</span>
-                                        <span className="text-yellow-600 font-bold">12 Medium</span>
-                                    </div>
-                                </motion.div>
-                            </div>
-                        </motion.div>
-                    </div>
-                </motion.div>
-                <motion.div
-                    initial={{ opacity: 0, x: 30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                >
-                    <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-                        Automated <span className="text-primary">Security Analysis</span>
-                    </h2>
-                    <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                        Our AI-powered system automatically analyzes your code, runs comprehensive security scans, and generates detailed reports without any manual intervention.
-                    </p>
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                            <CheckCircle className="h-5 w-5 text-primary" />
-                            <span className="text-muted-foreground">Automatic file upload and processing</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <CheckCircle className="h-5 w-5 text-primary" />
-                            <span className="text-muted-foreground">Multi-tool security scanning</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <CheckCircle className="h-5 w-5 text-primary" />
-                            <span className="text-muted-foreground">Detailed vulnerability reports</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <CheckCircle className="h-5 w-5 text-primary" />
-                            <span className="text-muted-foreground">Actionable remediation guidance</span>
-                        </div>
-                    </div>
-                    <div className="mt-10 p-4 bg-primary/5 border border-primary/20 rounded-lg">
-                        <div className="flex items-center gap-3 mb-3">
-                            <ShieldCheck className="w-5 h-5 text-primary" />
-                            <span className="font-medium text-foreground">Enterprise-Grade Security</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">Trusted by 1000+ organizations for automated security testing.</p>
-                    </div>
-                </motion.div>
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
+          {/* Left Side - Scanning Process */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="bg-background/50 backdrop-blur-xl border border-primary/10 rounded-2xl p-8 shadow-2xl"
+          >
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span className="ml-4 text-sm text-muted-foreground font-mono">Security Scanner</span>
             </div>
-        </section>
-    );
+
+            <div className="space-y-4">
+              {scanningSteps.map((step, index) => (
+                <motion.div
+                  key={step.id}
+                  variants={itemVariants}
+                  className={cn(
+                    'flex items-start gap-4 p-4 rounded-xl transition-all border',
+                    step.status === 'completed'
+                      ? 'bg-green-500/5 border-green-500/20'
+                      : step.status === 'running'
+                        ? 'bg-primary/5 border-primary/20'
+                        : 'bg-muted/30 border-transparent',
+                  )}
+                >
+                  <div className="flex-shrink-0 mt-1">{getStatusIcon(step.status)}</div>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-foreground">{step.title}</h4>
+                    <p className="text-sm text-muted-foreground">{step.description}</p>
+                    {step.status === 'running' && (
+                      <p className="text-xs text-primary mt-1 font-mono">Processing...</p>
+                    )}
+                  </div>
+                  <div className="flex-shrink-0">
+                    <step.icon
+                      className={cn(
+                        'w-5 h-5',
+                        step.status === 'completed'
+                          ? 'text-green-500'
+                          : step.status === 'running'
+                            ? 'text-primary'
+                            : 'text-muted-foreground/40',
+                      )}
+                    />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-border/50">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium">Overall Progress</span>
+                <span className="text-sm text-muted-foreground font-mono">50%</span>
+              </div>
+              <div className="w-full bg-muted/50 rounded-full h-2 overflow-hidden">
+                <motion.div
+                  className="bg-gradient-to-r from-primary to-accent-foreground h-2 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: '50%' }}
+                  transition={{ duration: 2, ease: 'easeOut' }}
+                />
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right Side - Results */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="space-y-6"
+          >
+            <div>
+              <h3 className="text-2xl font-bold text-foreground mb-4">Security Report</h3>
+              <p className="text-muted-foreground mb-6">
+                Comprehensive analysis results with actionable recommendations.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {mockResults.map((result, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className={`p-4 rounded-xl border backdrop-blur-sm ${getSeverityColor(result.type)}`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      <span className="font-medium capitalize">{result.type}</span>
+                    </div>
+                    <span className="text-2xl font-bold">{result.count}</span>
+                  </div>
+                  <p className="text-sm opacity-90">{result.description}</p>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="bg-primary/5 border border-primary/10 rounded-xl p-6 backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Zap className="w-5 h-5 text-primary" />
+                </div>
+                <h4 className="font-semibold">AI Recommendations</h4>
+              </div>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Use parameterized queries to prevent SQL injection</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Implement input validation for all user inputs</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Update dependencies to latest secure versions</span>
+                </li>
+              </ul>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
 }
