@@ -21,34 +21,36 @@ const Navbar = () => {
   }, []);
 
   return (
-    <header 
+    <header
       className={cn(
-        "fixed top-6 left-0 right-0 z-50 mx-auto max-w-5xl transition-all duration-300",
-        scrolled ? "px-4" : "px-0"
+        'fixed top-6 left-0 right-0 z-50 mx-auto max-w-5xl transition-all duration-300',
+        scrolled ? 'px-4' : 'px-0',
       )}
     >
-      <div className={cn(
-        "flex h-14 items-center justify-between rounded-full border px-6 backdrop-blur-xl transition-all",
-        scrolled 
-          ? "border-border/50 bg-background/80 shadow-lg" 
-          : "border-transparent bg-transparent"
-      )}>
+      <div
+        className={cn(
+          'flex h-14 items-center justify-between rounded-full border px-6 backdrop-blur-xl transition-all',
+          scrolled
+            ? 'border-border/50 bg-background/80 shadow-lg'
+            : 'border-transparent bg-transparent',
+        )}
+      >
         <Link href="/" className="flex items-center gap-2">
-          <Image 
-            src="/logo.png" 
-            alt="OpenVScan Logo" 
-            width={24} 
-            height={24} 
+          <Image
+            src="/logo.png"
+            alt="OpenVScan Logo"
+            width={24}
+            height={24}
             className="h-6 w-6 object-contain"
           />
           <span className="text-lg font-bold tracking-tight text-foreground">OpenVScan</span>
         </Link>
-        
+
         <nav className="hidden md:flex items-center gap-8">
           {['Features', 'How It Works', 'Docs'].map((item) => (
-            <Link 
-              key={item} 
-              href={item === 'Docs' ? '/docs' : `/#${item.toLowerCase().replace(/\s+/g, '-')}`} 
+            <Link
+              key={item}
+              href={item === 'Docs' ? '/docs' : `/#${item.toLowerCase().replace(/\s+/g, '-')}`}
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               {item}
@@ -57,7 +59,7 @@ const Navbar = () => {
         </nav>
 
         <div className="flex items-center gap-4">
-          <Link 
+          <Link
             href="https://github.com/Buddhsen-tripathi/openvscan"
             target="_blank"
             rel="noopener noreferrer"
@@ -66,10 +68,13 @@ const Navbar = () => {
             <Star className="w-4 h-4 mr-2" />
             <span className="hidden lg:inline">Star on GitHub</span>
           </Link>
-          <Link href="/signin" className="hidden md:inline-flex items-center justify-center rounded-full bg-primary px-5 py-1.5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:bg-primary/90 hover:shadow-[0_0_15px_rgba(112,51,255,0.4)] shadow-primary/40">
+          <Link
+            href="/signin"
+            className="hidden md:inline-flex items-center justify-center rounded-full bg-primary px-5 py-1.5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:bg-primary/90 hover:shadow-[0_0_15px_rgba(112,51,255,0.4)] shadow-primary/40"
+          >
             Get Started
           </Link>
-          <button 
+          <button
             className="md:hidden p-2 text-muted-foreground"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
@@ -89,16 +94,16 @@ const Navbar = () => {
           >
             <nav className="flex flex-col space-y-4">
               {['Features', 'How It Works', 'Docs'].map((item) => (
-                <Link 
-                  key={item} 
-                  href={item === 'Docs' ? '/docs' : `/#${item.toLowerCase().replace(/\s+/g, '-')}`} 
+                <Link
+                  key={item}
+                  href={item === 'Docs' ? '/docs' : `/#${item.toLowerCase().replace(/\s+/g, '-')}`}
                   className="text-base font-medium text-muted-foreground hover:text-foreground"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item}
                 </Link>
               ))}
-              <Link 
+              <Link
                 href="https://github.com/Buddhsen-tripathi/openvscan"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -108,8 +113,8 @@ const Navbar = () => {
                 <Star className="w-4 h-4 mr-2" />
                 Star on GitHub
               </Link>
-              <Link 
-                href="/signin" 
+              <Link
+                href="/signin"
                 className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

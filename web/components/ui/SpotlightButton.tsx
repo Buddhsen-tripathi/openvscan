@@ -11,7 +11,12 @@ interface SpotlightButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElem
   className?: string;
 }
 
-export default function SpotlightButton({ as: Component = 'button', className, children, ...props }: SpotlightButtonProps) {
+export default function SpotlightButton({
+  as: Component = 'button',
+  className,
+  children,
+  ...props
+}: SpotlightButtonProps) {
   const divRef = useRef<HTMLDivElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -53,8 +58,8 @@ export default function SpotlightButton({ as: Component = 'button', className, c
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={cn(
-        "relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full border border-input bg-background/50 px-6 font-medium text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
-        className
+        'relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full border border-input bg-background/50 px-6 font-medium text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background',
+        className,
       )}
       {...props}
     >

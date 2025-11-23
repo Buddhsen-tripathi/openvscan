@@ -25,12 +25,12 @@ export const Marquee = ({
   };
 
   return (
-    <div className={cn("group relative flex overflow-hidden", className)}>
+    <div className={cn('group relative flex overflow-hidden', className)}>
       <div
         style={{ '--marquee-duration': speedDuration[speed] } as React.CSSProperties}
         className={cn(
-          "flex min-w-full shrink-0 gap-8 py-4 animate-marquee flex-nowrap items-center",
-          direction === 'right' && 'animate-marquee-reverse'
+          'flex min-w-full shrink-0 gap-8 py-4 animate-marquee flex-nowrap items-center',
+          direction === 'right' && 'animate-marquee-reverse',
         )}
       >
         {items.map((item, idx) => (
@@ -48,8 +48,8 @@ export const Marquee = ({
         aria-hidden="true"
         style={{ '--marquee-duration': speedDuration[speed] } as React.CSSProperties}
         className={cn(
-          "flex min-w-full shrink-0 gap-8 py-4 animate-marquee flex-nowrap items-center absolute top-0 left-0",
-          direction === 'right' && 'animate-marquee-reverse'
+          'flex min-w-full shrink-0 gap-8 py-4 animate-marquee flex-nowrap items-center absolute top-0 left-0',
+          direction === 'right' && 'animate-marquee-reverse',
         )}
       >
         {items.map((item, idx) => (

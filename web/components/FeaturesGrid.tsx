@@ -35,7 +35,7 @@ export default function FeaturesGrid() {
     <section id="features" className="relative py-24 bg-background overflow-hidden">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080801a_1px,transparent_1px),linear-gradient(to_bottom,#8080801a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]"></div>
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -46,7 +46,8 @@ export default function FeaturesGrid() {
             Smarter, Faster <span className="text-primary">Security Testing</span>
           </h2>
           <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
-            OpenVScan combines the best open-source tools with intelligent automation to secure your code before it ever reaches production.
+            OpenVScan combines the best open-source tools with intelligent automation to secure your
+            code before it ever reaches production.
           </p>
         </motion.div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
@@ -67,12 +68,8 @@ export default function FeaturesGrid() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-foreground mb-3">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {feature.description}
-                  </p>
+                  <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
                 </div>
               </div>
             </motion.div>

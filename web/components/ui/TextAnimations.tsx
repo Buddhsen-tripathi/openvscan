@@ -3,7 +3,15 @@
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-export const SplitText = ({ text, className, delay = 0 }: { text: string, className?: string, delay?: number }) => {
+export const SplitText = ({
+  text,
+  className,
+  delay = 0,
+}: {
+  text: string;
+  className?: string;
+  delay?: number;
+}) => {
   const words = text.split(' ');
 
   const container = {
@@ -52,7 +60,17 @@ export const SplitText = ({ text, className, delay = 0 }: { text: string, classN
   );
 };
 
-export const BlurText = ({ text, className, delay = 0, duration = 1 }: { text: string, className?: string, delay?: number, duration?: number }) => {
+export const BlurText = ({
+  text,
+  className,
+  delay = 0,
+  duration = 1,
+}: {
+  text: string;
+  className?: string;
+  delay?: number;
+  duration?: number;
+}) => {
   return (
     <motion.p
       initial={{ filter: 'blur(10px)', opacity: 0 }}
