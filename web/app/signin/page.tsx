@@ -4,12 +4,16 @@ import Link from 'next/link';
 import { useState } from 'react';
 import Image from 'next/image';
 import { FaGoogle, FaGithub } from 'react-icons/fa';
+import { signIn } from '@/lib/auth-client';
+import { useRouter } from 'next/navigation';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   return (
     <section className="p-3 min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
@@ -45,11 +49,32 @@ export default function SignInPage() {
         <form
           className="space-y-5"
           autoComplete="off"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
             setLoading(true);
+            setError(null);
+            await signIn.email({
+              email,
+              password,
+              callbackURL: '/dashboard',
+              fetchOptions: {
+                onSuccess: () => {
+                  setLoading(false);
+                  router.push('/dashboard');
+                },
+                onError: (ctx) => {
+                  setLoading(false);
+                  setError(ctx.error.message);
+                },
+              },
+            });
           }}
         >
+          {error && (
+            <div className="text-red-500 text-sm text-center bg-red-500/10 py-2 rounded-lg border border-red-500/20">
+              {error}
+            </div>
+          )}
           <div>
             <input
               type="email"
