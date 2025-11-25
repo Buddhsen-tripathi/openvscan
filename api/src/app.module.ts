@@ -6,7 +6,6 @@ import { ScanModule } from './scan/scan.module';
 import { LoggingInterceptor } from './common/logging.interceptor';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
-import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -14,7 +13,6 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
     }),
     DatabaseModule,
-    AuthModule,
     ScanModule,
   ],
   controllers: [AppController],
