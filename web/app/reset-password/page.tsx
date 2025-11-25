@@ -55,9 +55,7 @@ function ResetPasswordContent() {
   return (
     <>
       <h3 className="mb-2 text-xl font-semibold text-foreground">Set new password</h3>
-      <p className="mb-8 text-sm text-muted-foreground">
-        Please enter your new password below.
-      </p>
+      <p className="mb-8 text-sm text-muted-foreground">Please enter your new password below.</p>
 
       {/* Form */}
       <form
@@ -174,7 +172,7 @@ export default function ResetPasswordPage() {
           />
           <h2 className="text-2xl font-bold text-foreground tracking-tight">OpenVScan</h2>
         </div>
-        
+
         <Suspense fallback={<div>Loading...</div>}>
           <ResetPasswordContent />
         </Suspense>

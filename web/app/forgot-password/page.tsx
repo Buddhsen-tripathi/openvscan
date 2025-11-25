@@ -38,7 +38,7 @@ export default function ForgotPasswordPage() {
         </div>
         <h3 className="mb-2 text-xl font-semibold text-foreground">Reset your password</h3>
         <p className="mb-8 text-sm text-muted-foreground">
-          Enter your email address and we'll send you a link to reset your password.
+          Enter your email address and we&apos;ll send you a link to reset your password.
         </p>
 
         {/* Form */}

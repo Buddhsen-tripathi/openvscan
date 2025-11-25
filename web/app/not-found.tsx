@@ -27,11 +27,11 @@ export default function NotFound() {
           />
           <h2 className="text-2xl font-bold text-foreground tracking-tight">OpenVScan</h2>
         </div>
-        
+
         <h1 className="text-6xl font-bold text-primary mb-4">404</h1>
         <h3 className="mb-2 text-xl font-semibold text-foreground">Page Not Found</h3>
         <p className="mb-8 text-sm text-muted-foreground">
-          The page you are looking for doesn't exist or has been moved.
+          The page you are looking for doesn&apos;t exist or has been moved.
         </p>
 
         <Link
