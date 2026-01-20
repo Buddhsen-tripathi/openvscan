@@ -1,168 +1,162 @@
 # OpenVScan
 
-OpenVScan is a web-based vulnerability scanner that integrates open-source tools with AI to deliver smarter, faster and more reliable pre-production security testing.
+OpenVScan is a web-based vulnerability scanner that integrates open-source security tools with AI to deliver smarter, faster, and more reliable pre-production security testing.
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-![GithubStars](https://img.shields.io/github/stars/Buddhsen-tripathi/openvscan?style=social)
-[![GitHub issues](https://img.shields.io/github/issues/Buddhsen-tripathi/openvscan.svg)](https://github.com/Buddhsen-tripathi/openvscan/issues)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/Buddhsen-tripathi/openvscan/actions)
+![GitHub Stars](https://img.shields.io/github/stars/Buddhsen-tripathi/openvscan?style=social)
+[![GitHub Issues](https://img.shields.io/github/issues/Buddhsen-tripathi/openvscan.svg)](https://github.com/Buddhsen-tripathi/openvscan/issues)
 
-## Links
+## 🚀 Quick Start
 
-- Join the waitlist: https://openvscan.com
-- Dev preview: https://openvscan-web.buddhsen-work.workers.dev/
+Get up and running in 5 minutes:
 
-## Planned Architecture
+```bash
+# Clone and install
+git clone https://github.com/Buddhsen-tripathi/openvscan.git
+cd openvscan
+pnpm install
 
-| Tier         | Stack                                 | Responsibilities                                        |
-| ------------ | ------------------------------------- | ------------------------------------------------------- |
-| UI (`web/`)  | Next.js 15, React 19, Tailwind CSS    | Scan setup, dashboards, reporting, multi-tenant UX      |
-| API (`api/`) | NestJS 11, TypeScript, PostgreSQL ORM | Projects, auth, scan orchestration, findings API        |
-| Workers      | Containerized runners + message queue | Execute scanners, aggregate artifacts, stream telemetry |
-| Storage      | PostgreSQL, object storage, Redis     | Metadata, artifacts, coordination primitives            |
-| AI Services  | LLM providers                         | Summaries, deduplication, remediation guidance          |
+# Start infrastructure
+docker compose up -d
 
-## Repository Layout
+# Build shared packages and run migrations
+pnpm run prebuild
+pnpm --filter openvscan-api db:push
+
+# Start all services
+pnpm run dev
+```
+
+**Access Points:**
+- 🌐 Web App: http://localhost:3000
+- 🔧 API: http://localhost:5000
+- 📚 API Docs: http://localhost:5000/api/docs
+
+For detailed setup instructions, see [QUICKSTART.md](QUICKSTART.md) or [SETUP.md](SETUP.md).
+
+## ✨ Features
+
+### Current (MVP)
+- ✅ User authentication with email/password
+- ✅ Multi-tenant project management
+- ✅ Async vulnerability scanning with Trivy
+- ✅ Real-time scan status updates
+- ✅ Findings display with severity breakdown
+- ✅ Scan execution logs
+- ✅ RESTful API with Swagger documentation
+
+### Planned
+- 🔜 Multiple scanner integration (Nmap, OWASP ZAP, Semgrep)
+- 🔜 AI-powered vulnerability analysis and deduplication
+- 🔜 Export formats (SARIF, JSON, PDF)
+- 🔜 Scheduled scans and baselines
+- 🔜 Team collaboration features
+- 🔜 CI/CD pipeline integration
+
+See [MVP_STATUS.md](MVP_STATUS.md) for complete feature list and roadmap.
+
+## 🏗️ Architecture
+
+| Tier | Stack | Responsibilities |
+|------|-------|------------------|
+| **UI** (`web/`) | Next.js 15, React 19, Tailwind CSS | Scan setup, dashboards, reporting |
+| **API** (`api/`) | NestJS 11, PostgreSQL (Drizzle ORM) | Auth, projects, scan orchestration |
+| **Workers** (`workers/`) | BullMQ, Redis | Execute scanners, process findings |
+| **Storage** | PostgreSQL, Redis | Metadata, queue coordination |
+| **AI** | OpenAI/Anthropic | Analysis, deduplication, remediation |
+
+## 📁 Repository Structure
 
 ```
 openvscan/
-├── api/                 # NestJS 11 service (REST + background jobs)
-├── web/                 # Next.js 15 / React 19 application
-├── deploy/              # charts and infra manifests
-├── docker/              # Local development containers & scripts
-├── packages/            # Shared libraries (future)
-├── scripts/             # Tooling, scanner runners, automation
-└── README.md
-└── LICENSE
+├── api/                    # NestJS backend
+│   ├── src/
+│   │   ├── common/        # Guards, interceptors, filters
+│   │   ├── database/      # Database configuration
+│   │   ├── project/       # Project CRUD
+│   │   ├── scan/          # Scan orchestration
+│   │   └── queue/         # BullMQ setup
+│   └── database/          # Migrations
+├── web/                   # Next.js frontend
+│   ├── app/               # App router pages
+│   ├── components/        # React components
+│   └── lib/               # API client, utilities
+├── workers/               # Background job processors
+│   ├── src/
+│   │   ├── processors/   # Job handlers
+│   │   ├── scanners/     # Scanner integrations
+│   │   └── ai/           # AI service
+├── packages/              # Shared monorepo packages
+│   ├── db/               # Database schema
+│   └── types/            # Shared TypeScript types
+└── docker-compose.yml    # Infrastructure (Redis)
 ```
 
-## Installation
+## 🛠️ Development
+
+### Prerequisites
+- Node.js 18+
+- pnpm 8+
+- PostgreSQL database (Neon recommended)
+- Docker (for Redis)
+- Trivy CLI (for scanning)
+
+### Commands
 
 ```bash
-git clone https://github.com/your-username/openvscan.git
-cd openvscan
-pnpm install
+# Development
+pnpm run dev              # Start all services
+pnpm run dev:api          # API only
+pnpm run dev:web          # Web only
+pnpm run dev:workers      # Workers only
+
+# Building
+pnpm run prebuild         # Build shared packages
+pnpm run build            # Build all services
+
+# Database
+pnpm --filter openvscan-api db:generate  # Generate migrations
+pnpm --filter openvscan-api db:push      # Apply migrations
+
+# Code Quality
+pnpm lint                 # Lint all projects
+pnpm format               # Format all code
+pnpm test                 # Run tests
 ```
 
-> This repository will remain a pnpm workspace; use filters for project-specific commands (e.g., `pnpm --filter api …`).
+## 📖 Documentation
 
-## Environment Configuration
+- **[QUICKSTART.md](QUICKSTART.md)** - Get started in 5 minutes
+- **[SETUP.md](SETUP.md)** - Detailed setup guide
+- **[MVP_STATUS.md](MVP_STATUS.md)** - Current features and roadmap
+- **[AGENTS.MD](AGENTS.MD)** - Architecture context for AI agents
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community standards
 
-1. Duplicate the root environment file:
-   ```bash
-   cp .env.example .env
-   ```
-2. Populate service-specific overrides as they appear:
-   - `api/.env` for the NestJS backend
-   - `web/.env.local` for the Next.js UI
+## 🤝 Contributing
 
-## Running Locally (Roadmap)
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-### Full Stack (Docker)
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
 
-```bash
-docker compose up --build
-```
+## 📝 License
 
-- UI will serve at <http://localhost:3000>.
-- API will expose <http://localhost:5000>.
+Licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
 
-### API Only
+## 🙏 Acknowledgements
 
-```bash
-pnpm --filter openvscan-api start:dev
-```
+OpenVScan builds on trusted open-source security tools:
+- [Trivy](https://github.com/aquasecurity/trivy) - Container & filesystem scanning
+- [OWASP ZAP](https://www.zaproxy.org/) - DAST scanning (planned)
+- [Nmap](https://nmap.org/) - Network scanning (planned)
+- [Semgrep](https://semgrep.dev/) - Static analysis (planned)
 
-- Nest CLI will provide hot reload.
-- Swagger (when enabled) will live at `/docs`.
+---
 
-### Web UI Only
+**Made with ❤️ by [Buddhsen Tripathi](https://github.com/Buddhsen-tripathi)**
 
-```bash
-pnpm --filter openvscan-web dev
-```
-
-- Next.js dev server will proxy API requests to `localhost:5000`.
-
-## Formatting the code
-
-We enforce consistent code style across the repository using [Prettier](https://prettier.io/) for both the API (`api/`) and Web (`web/`) projects.
-
-### Setup
-
-1. **Install the Prettier VS Code extension:**  
-   Search for `esbenp.prettier-vscode` in the Extensions panel and install it.
-
-2. **Workspace Formatting Settings:**  
-   The repository includes a recommended VS Code settings file at `.vscode/settings.json`:
-
-   ```json
-   {
-     "editor.defaultFormatter": "esbenp.prettier-vscode",
-     "editor.formatOnSave": true,
-     "editor.codeActionsOnSave": {
-       "source.fixAll.eslint": true
-     },
-     "eslint.validate": [
-       "javascript",
-       "typescript",
-       "typescriptreact",
-       "javascriptreact"
-     ]
-   }
-   ```
-
-   - This ensures Prettier is used as the default formatter and formats code automatically on save.
-   - ESLint fixes are also applied on save for supported file types.
-
-3. **Manual Formatting:**  
-   You can manually format your codebase by running:
-
-   ```bash
-   pnpm format
-   ```
-
-> Please ensure your code is formatted before committing. Formatting is enforced in CI.
-
-## Usage (Vision)
-
-1. Upload a target (artifact, URL, or Git connection).
-2. Select scanners (static analysis, dependency audit, DAST, container checks).
-3. Run the pipeline and allow AI triage to surface critical issues.
-4. Review findings in the dashboard and apply recommended fixes.
-5. Export reports (JSON, SARIF, PDF) for stakeholders.
-
-## Example Outcomes (Planned)
-
-- Critical findings such as SQL injection, XSS, RCE, SSRF.
-- Dependency exposure reports for outdated or vulnerable packages.
-- Infrastructure misconfiguration insights (e.g., Kubernetes, Terraform).
-- AI-enhanced remediation steps with code snippets and context.
-
-## Testing & Quality (Planned)
-
-```bash
-pnpm lint
-pnpm test
-pnpm --filter api test
-pnpm --filter web test
-pnpm test:e2e
-pytest tests/workers
-```
-
-Static analysis (`pnpm --filter api lint`) and formatting (`pnpm format`) will enforce workspace standards.
-
-## Contributing
-
-1. Fork the repository and create a feature branch.
-2. Run `pnpm lint` and `pnpm test` (plus relevant filters) before opening a PR.
-3. Include screenshots or recordings for UI-facing changes.
-4. Reference linked issues and follow the [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
-
-## License
-
-Licensed under the Apache License 2.0. See [LICENSE](./LICENSE) for terms.
-
-## Acknowledgements
-
-OpenVScan will build on trusted open-source security tools (e.g., OWASP ZAP, Nmap, Trivy) and layer AI-driven analysis to make vulnerability scanning more effective and accessible.
+For questions or support, please [open an issue](https://github.com/Buddhsen-tripathi/openvscan/issues).
