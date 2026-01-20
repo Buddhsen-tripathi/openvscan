@@ -18,4 +18,13 @@ export class ScanController {
   async scan(@Body() scanRequest: ScanRequestDto) {
     return this.scanService.scan(scanRequest);
   }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Get scan details',
+    description: 'Retrieves scan details including status, findings, and execution logs.',
+  })
+  async getScan(@Param('id') id: string) {
+    return this.scanService.findOne(id);
+  }
 }

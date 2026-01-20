@@ -6,9 +6,7 @@ const client = createFetch({
   headers: {
     'Content-Type': 'application/json',
   },
-  // Add credential handling here if using tokens, otherwise cookies should be sent automatically if same domain/CORS allows
-  // For better-auth, if we are proxying or CORS is set up, cookies might work.
-  // We might need to manually pass headers if using a token approach.
+  credentials: 'include', // Important: Send cookies with cross-origin requests
 });
 
 export const api = {
