@@ -1,4 +1,4 @@
-import execa from 'execa';
+import { execa } from 'execa';
 import { Scanner, ScanResult } from './base.scanner';
 import { Finding, Severity, ScanConfig } from '@openvscan/types';
 import * as fs from 'fs/promises';
@@ -24,13 +24,13 @@ export class TrivyScanner implements Scanner {
     }
 
     // Determine scan type based on target (image vs fs)
-    // Simple heuristic: if it looks like a URL/repo, clone it first? 
-    // For now, assume target is a path or image name. 
+    // Simple heuristic: if it looks like a URL/repo, clone it first?
+    // For now, assume target is a path or image name.
     // If we want to scan a repo, we might need a separate 'Clone' step in the worker pipeline.
-    
+
     // For this implementation, we'll assume 'fs' scan on a path or 'image' scan
     const scanType = target.includes('/') && !target.startsWith('/') ? 'image' : 'fs';
-    
+
     // Create temp file for JSON output
     const tempDir = os.tmpdir();
     const outputPath = path.join(tempDir, `trivy-result-${Date.now()}.json`);

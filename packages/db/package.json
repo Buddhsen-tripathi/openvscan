@@ -11,14 +11,14 @@
     "push": "drizzle-kit push"
   },
   "dependencies": {
-    "drizzle-orm": "^0.44.6",
-    "drizzle-kit": "^0.31.5",
-    "pg": "^8.11.3",
     "@neondatabase/serverless": "^1.0.2",
-    "dotenv": "^16.4.5"
+    "dotenv": "^17.2.3",
+    "drizzle-kit": "^0.31.8",
+    "drizzle-orm": "^0.45.1",
+    "pg": "^8.17.1"
   },
   "devDependencies": {
-    "@types/pg": "^8.11.0",
-    "typescript": "^5.0.0"
+    "@types/pg": "^8.16.0",
+    "typescript": "^5.9.3"
   }
 }
