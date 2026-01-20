@@ -78,12 +78,11 @@ docker compose up -d
 
 ### 4. Run Database Migrations
 
-Build the packages and run migrations:
+Run database migrations:
 
 ```bash
-# Build shared packages
-pnpm --filter @openvscan/db build
-pnpm --filter @openvscan/types build
+# Build shared packages (automatically done by dev script, but needed for migrations)
+pnpm run prebuild
 
 # Run migrations
 pnpm --filter openvscan-api db:push
@@ -94,6 +93,7 @@ pnpm --filter openvscan-api db:push
 #### Option A: Run All Services (Recommended)
 
 ```bash
+# This automatically builds shared packages before starting
 pnpm run dev
 ```
 
