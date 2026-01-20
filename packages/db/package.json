@@ -1,0 +1,24 @@
+{
+  "name": "@openvscan/db",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "push": "drizzle-kit push"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.6",
+    "drizzle-kit": "^0.31.5",
+    "pg": "^8.11.3",
+    "@neondatabase/serverless": "^1.0.2",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.0",
+    "typescript": "^5.0.0"
+  }
+}

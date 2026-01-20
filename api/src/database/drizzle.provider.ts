@@ -2,7 +2,7 @@ import { drizzle, NeonHttpDatabase } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import { Provider } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as schema from './models/schema';
+import * as schema from '@openvscan/db';
 
 export const DATABASE_PROVIDER = 'DATABASE_PROVIDER';
 export const NEON_PROVIDER = 'NEON_PROVIDER';

@@ -3,39 +3,36 @@ import {
   IsNotEmpty,
   IsOptional,
   IsEnum,
-  Matches,
+  IsArray,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ScanType } from '../types';
+import { ScanType } from '@openvscan/types';
 
 export class ScanRequestDto {
   @ApiProperty({
     enum: ScanType,
-    description: 'Specifies the type of scan to perform.',
-    example: ScanType.NPM,
+    isArray: true,
+    description: 'Specifies the types of scans to perform.',
+    example: [ScanType.STATIC_ANALYSIS],
   })
-  @IsEnum(ScanType)
+  @IsArray()
+  @IsEnum(ScanType, { each: true })
   @IsNotEmpty()
-  type: ScanType;
+  scanners: ScanType[];
 
   @ApiProperty({
     description:
       'Target to scan. For example, an NPM package name, GitHub repository URL, or file path.',
-    example: 'express',
+    example: 'https://github.com/expressjs/express',
   })
   @IsString()
   @IsNotEmpty()
   target: string;
 
   @ApiPropertyOptional({
-    description:
-      'Optional version of the target to scan. If omitted, the latest version will be scanned.',
-    example: '4.18.2',
+    description: 'ID of the project to associate the scan with.',
   })
   @IsOptional()
   @IsString()
-  @Matches(/^\d+\.\d+\.\d+$/, {
-    message: 'version must follow semantic versioning (e.g., 1.2.3)',
-  })
-  version?: string;
+  projectId?: string;
 }

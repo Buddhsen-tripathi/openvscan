@@ -1,0 +1,28 @@
+{
+  "name": "openvscan-workers",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/index.ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "@openvscan/db": "workspace:*",
+    "@openvscan/types": "workspace:*",
+    "bullmq": "^5.0.0",
+    "dotenv": "^16.0.0",
+    "drizzle-orm": "^0.44.7",
+    "execa": "^5.1.1",
+    "ioredis": "^5.3.0",
+    "openai": "^6.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "openvscan",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OpenVScan - Open-source vulnerability scanner with AI-assisted analysis",
+  "scripts": {
+    "dev": "pnpm run --parallel --filter openvscan-api start:dev --filter openvscan-web dev --filter openvscan-workers dev",
+    "dev:api": "pnpm --filter openvscan-api start:dev",
+    "dev:web": "pnpm --filter openvscan-web dev",
+    "dev:workers": "pnpm --filter openvscan-workers dev",
+    "build": "pnpm --filter openvscan-api build && pnpm --filter openvscan-web build && pnpm --filter openvscan-workers build",
+    "build:api": "pnpm --filter openvscan-api build",
+    "build:web": "pnpm --filter openvscan-web build",
+    "start": "pnpm --filter openvscan-api start:prod",
+    "lint": "pnpm --filter openvscan-api lint && pnpm --filter openvscan-web lint",
+    "format": "pnpm --filter openvscan-api format && pnpm --filter openvscan-web format",
+    "test": "pnpm --filter openvscan-api test && pnpm --filter openvscan-web test",
+    "test:e2e": "pnpm --filter openvscan-api test:e2e",
+    "test:cov": "pnpm --filter openvscan-api test:cov"
+  },
+  "keywords": [
+    "vulnerability-scanner",
+    "security",
+    "ai",
+    "openvscan"
+  ],
+  "author": "Buddhsen Tripathi",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Buddhsen-tripathi/openvscan.git"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

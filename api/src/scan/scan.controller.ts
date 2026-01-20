@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, HttpCode, HttpStatus } from '@nestjs/common';
 import { ScanService } from './scan.service';
 import { ScanRequestDto } from './dto/scan-request.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';

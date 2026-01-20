@@ -1,104 +1,86 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+import { DATABASE_PROVIDER } from '../database/drizzle.provider';
+import { NeonHttpDatabase } from 'drizzle-orm/neon-http';
+import * as schema from '@openvscan/db';
 import { ScanRequestDto } from './dto/scan-request.dto';
-import { ScanResult, Vulnerability, ScanType } from './types';
+import { ScanStatus } from '@openvscan/types';
+import { eq } from 'drizzle-orm';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class ScanService {
-  async scan(scanRequest: ScanRequestDto): Promise<ScanResult> {
-    const scanId = this.generateScanId();
-    const timestamp = new Date().toISOString();
+  constructor(
+    @Inject(DATABASE_PROVIDER)
+    private readonly db: NeonHttpDatabase<typeof schema>,
+    @InjectQueue('scan-queue') private readonly scanQueue: Queue,
+  ) {}
 
-    try {
-      let vulnerabilities: Vulnerability[] = [];
-
-      if (scanRequest.type === ScanType.NPM) {
-        vulnerabilities = await this.scanNpmPackage(
-          scanRequest.target,
-          scanRequest.version,
-        );
-      } else if (scanRequest.type === ScanType.PACKAGE_JSON) {
-        vulnerabilities = await this.scanPackageJson(scanRequest.target);
-      }
-
-      const summary = this.calculateSummary(vulnerabilities);
-
-      return {
-        scanId,
-        timestamp,
-        target: scanRequest.target,
-        vulnerabilities,
-        summary,
-      };
-    } catch (error) {
-      throw new HttpException(
-        `Scan failed: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  private async scanNpmPackage(
-    packageName: string,
-    version?: string,
-  ): Promise<Vulnerability[]> {
-    // Mock implementation - in production, this would call npm audit API or vulnerability database
-    const mockVulnerabilities: Vulnerability[] = [
-      {
-        package: packageName,
-        version: version || 'unknown',
-        severity: 'high',
-        cve: 'CVE-2024-XXXXX',
-        description: `Security vulnerability found in ${packageName}`,
-        fix: 'Upgrade to latest version',
-      },
-    ];
-
-    // Simulate some packages having no vulnerabilities
-    if (packageName.includes('safe') || packageName.includes('secure')) {
-      return [];
+  async scan(scanRequest: ScanRequestDto) {
+    // For now, we require a project ID. In the future, we can infer it or create a default one.
+    if (!scanRequest.projectId) {
+      throw new BadRequestException('Project ID is required to start a scan');
     }
 
-    return mockVulnerabilities;
-  }
-
-  private async scanPackageJson(content: string): Promise<Vulnerability[]> {
-    try {
-      const packageJson = JSON.parse(content);
-      const dependencies = {
-        ...packageJson.dependencies,
-        ...packageJson.devDependencies,
-      };
-
-      const vulnerabilities: Vulnerability[] = [];
-
-      for (const [pkg, version] of Object.entries(dependencies)) {
-        const pkgVulns = await this.scanNpmPackage(pkg, version as string);
-        vulnerabilities.push(...pkgVulns);
-      }
-
-      return vulnerabilities;
-    } catch (error) {
-      throw new Error('Invalid package.json format');
-    }
-  }
-
-  private calculateSummary(vulnerabilities: Vulnerability[]) {
-    const summary = {
-      critical: 0,
-      high: 0,
-      medium: 0,
-      low: 0,
-      total: vulnerabilities.length,
-    };
-
-    vulnerabilities.forEach((vuln) => {
-      summary[vuln.severity]++;
+    // Verify project exists
+    const project = await this.db.query.project.findFirst({
+      where: eq(schema.project.id, scanRequest.projectId),
     });
 
-    return summary;
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${scanRequest.projectId} not found`);
+    }
+
+    const scanId = uuidv4();
+    const timestamp = new Date();
+
+    // Create scan record
+    await this.db.insert(schema.scan).values({
+      id: scanId,
+      projectId: scanRequest.projectId,
+      status: ScanStatus.PENDING,
+      config: {
+        target: scanRequest.target,
+        scanners: scanRequest.scanners,
+      },
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    });
+
+    // Dispatch job to worker
+    await this.scanQueue.add('scan', {
+      scanId,
+      config: {
+        target: scanRequest.target,
+        scanners: scanRequest.scanners,
+      },
+    });
+
+    return {
+      scanId,
+      status: ScanStatus.PENDING,
+      target: scanRequest.target,
+      timestamp: timestamp.toISOString(),
+      message: 'Scan started successfully',
+    };
   }
 
-  private generateScanId(): string {
-    return `scan_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  async findOne(id: string) {
+    const scan = await this.db.query.scan.findFirst({
+      where: eq(schema.scan.id, id),
+      with: {
+        findings: true,
+        logs: {
+          orderBy: (logs, { asc }) => [asc(logs.timestamp)],
+        },
+      },
+    });
+
+    if (!scan) {
+      throw new NotFoundException(`Scan with ID ${id} not found`);
+    }
+
+    return scan;
   }
 }
