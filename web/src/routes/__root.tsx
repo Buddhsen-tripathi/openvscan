@@ -69,10 +69,16 @@ function RootComponent() {
   );
 }
 
+// Applied before paint to avoid a flash of the wrong theme. Honors a stored
+// preference, falling back to the OS setting.
+const themeScript = `(function(){try{var t=localStorage.getItem('openvscan-theme');var dark=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',dark);}catch(e){}})();`;
+
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
+        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: required for the pre-paint theme script */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <HeadContent />
       </head>
       <body className="font-sans antialiased">

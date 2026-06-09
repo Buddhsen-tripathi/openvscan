@@ -2,6 +2,7 @@ import { useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, ScanSearch, Settings } from "lucide-react";
 import Image from "@/components/AppImage";
 import Link from "@/components/AppLink";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
 import { useDashboardUser } from "./DashboardContext";
 
@@ -74,6 +75,7 @@ export function Sidebar() {
               {user.email}
             </p>
           </div>
+          <ThemeToggle className="size-7 shrink-0" />
         </div>
       </div>
     </aside>

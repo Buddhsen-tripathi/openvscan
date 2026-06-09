@@ -4,14 +4,11 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design tokens. Values below faithfully mirror the nimu-outreach palette
- * (warm-charcoal monochrome, OKLch). They are intentionally isolated here:
- * to re-theme the whole app, edit only :root and .dark — every component
  * consumes these via semantic Tailwind classes (bg-card, text-primary, …),
  * never hardcoded colors.
  */
 :root {
-  --background: oklch(0.9195 0.0169 88.003);
+  --background: oklch(92.834% 0.01395 88.675);
   --foreground: oklch(0.235 0 0);
   --card: oklch(0.953 0.0156 86.4257);
   --card-foreground: oklch(0.235 0 0);
@@ -61,7 +58,7 @@
   --shadow-xl: 0px 4px 10px 0px hsl(0 0% 0% / 0.1), 0px 8px 10px -1px hsl(0 0% 0% / 0.1);
   --shadow-2xl: 0px 4px 10px 0px hsl(0 0% 0% / 0.25);
 
-  /* Domain semantic tokens — severity & scan status (kept from OpenVScan) */
+  /* Domain semantic tokens — severity & scan status */
   --severity-critical: oklch(0.5771 0.2152 27.325);
   --severity-critical-foreground: oklch(1 0 0);
   --severity-critical-muted: color-mix(in oklab, oklch(0.5771 0.2152 27.325) 14%, transparent);

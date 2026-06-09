@@ -5,6 +5,7 @@ import { Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import Image from "@/components/AppImage";
 import Link from "@/components/AppLink";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
 import { MenuIcon } from "./ui/Icons";
 
@@ -93,6 +94,7 @@ const Navbar = () => {
             <Star className="w-3.5 h-3.5" />
             {starCount !== null ? formatStarCount(starCount) : "—"}
           </Link>
+          <ThemeToggle className="hidden rounded-full md:inline-flex" />
           <Link
             href="/signin"
             className="hidden md:inline-flex items-center justify-center rounded-full bg-primary px-5 py-1.5 text-sm font-semibold text-primary-foreground transition-colors duration-300 hover:bg-primary/90"
