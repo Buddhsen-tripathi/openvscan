@@ -1,4 +1,5 @@
 import { pgTable, text, timestamp, jsonb, pgEnum } from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
 import { user } from './auth';
 
 // Enums matching @openvscan/types
@@ -71,3 +72,35 @@ export const scanLog = pgTable('scan_log', {
   message: text('message').notNull(),
   timestamp: timestamp('timestamp').defaultNow().notNull(),
 });
+
+// Relations
+export const projectRelations = relations(project, ({ one, many }) => ({
+  user: one(user, {
+    fields: [project.userId],
+    references: [user.id],
+  }),
+  scans: many(scan),
+}));
+
+export const scanRelations = relations(scan, ({ one, many }) => ({
+  project: one(project, {
+    fields: [scan.projectId],
+    references: [project.id],
+  }),
+  findings: many(finding),
+  logs: many(scanLog),
+}));
+
+export const findingRelations = relations(finding, ({ one }) => ({
+  scan: one(scan, {
+    fields: [finding.scanId],
+    references: [scan.id],
+  }),
+}));
+
+export const scanLogRelations = relations(scanLog, ({ one }) => ({
+  scan: one(scan, {
+    fields: [scanLog.scanId],
+    references: [scan.id],
+  }),
+}));

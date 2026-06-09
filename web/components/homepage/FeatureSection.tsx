@@ -1,52 +1,57 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Shield, Zap, Code2, Database, Eye, Lock } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { motion } from "framer-motion";
+import { Code2, Database, Eye, Lock, Shield, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const features = [
   {
     icon: Shield,
-    title: 'AI-Powered Detection',
+    title: "AI-Powered Detection",
     description:
-      'Advanced machine learning algorithms identify vulnerabilities with 99.9% accuracy.',
-    color: 'text-blue-500',
-    bgColor: 'bg-blue-500/10',
+      "Advanced machine learning algorithms identify vulnerabilities with 99.9% accuracy.",
+    color: "text-blue-500",
+    bgColor: "bg-blue-500/10",
   },
   {
     icon: Zap,
-    title: 'Real-Time Scanning',
-    description: 'Get instant security feedback as you write code with continuous monitoring.',
-    color: 'text-green-500',
-    bgColor: 'bg-green-500/10',
+    title: "Real-Time Scanning",
+    description:
+      "Get instant security feedback as you write code with continuous monitoring.",
+    color: "text-green-500",
+    bgColor: "bg-green-500/10",
   },
   {
     icon: Code2,
-    title: 'Multi-Language Support',
-    description: 'Comprehensive security analysis for JavaScript, Python, Go, Java, and more.',
-    color: 'text-purple-500',
-    bgColor: 'bg-purple-500/10',
+    title: "Multi-Language Support",
+    description:
+      "Comprehensive security analysis for JavaScript, Python, Go, Java, and more.",
+    color: "text-purple-500",
+    bgColor: "bg-purple-500/10",
   },
   {
     icon: Database,
-    title: 'Dependency Security',
-    description: 'Scan your dependencies for known vulnerabilities and security issues.',
-    color: 'text-orange-500',
-    bgColor: 'bg-orange-500/10',
+    title: "Dependency Security",
+    description:
+      "Scan your dependencies for known vulnerabilities and security issues.",
+    color: "text-orange-500",
+    bgColor: "bg-orange-500/10",
   },
   {
     icon: Eye,
-    title: 'Deep Code Analysis',
-    description: 'Static analysis that goes beyond surface-level checks to find hidden issues.',
-    color: 'text-pink-500',
-    bgColor: 'bg-pink-500/10',
+    title: "Deep Code Analysis",
+    description:
+      "Static analysis that goes beyond surface-level checks to find hidden issues.",
+    color: "text-pink-500",
+    bgColor: "bg-pink-500/10",
   },
   {
     icon: Lock,
-    title: 'Compliance Ready',
-    description: 'Meet OWASP, PCI-DSS, and SOC2 requirements with automated compliance reports.',
-    color: 'text-indigo-500',
-    bgColor: 'bg-indigo-500/10',
+    title: "Compliance Ready",
+    description:
+      "Meet OWASP, PCI-DSS, and SOC2 requirements with automated compliance reports.",
+    color: "text-indigo-500",
+    bgColor: "bg-indigo-500/10",
   },
 ];
 
@@ -85,13 +90,14 @@ export default function FeatureSection() {
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-tight">
             Everything You Need for
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent-foreground">
-              {' '}
+              {" "}
               Security
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Comprehensive security scanning with cutting-edge AI technology. Protect your
-            applications from vulnerabilities before they become threats.
+            Comprehensive security scanning with cutting-edge AI technology.
+            Protect your applications from vulnerabilities before they become
+            threats.
           </p>
         </motion.div>
 
@@ -110,7 +116,7 @@ export default function FeatureSection() {
             >
               <div
                 className={cn(
-                  'inline-flex items-center justify-center w-12 h-12 rounded-xl mb-6 group-hover:-translate-y-1 transition-transform duration-300',
+                  "inline-flex items-center justify-center w-12 h-12 rounded-xl mb-6 group-hover:-translate-y-1 transition-transform duration-300",
                   feature.bgColor,
                   feature.color,
                 )}
@@ -118,9 +124,13 @@ export default function FeatureSection() {
                 <feature.icon className="w-6 h-6" />
               </div>
 
-              <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-3">
+                {feature.title}
+              </h3>
 
-              <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+              <p className="text-muted-foreground leading-relaxed">
+                {feature.description}
+              </p>
 
               <div className="absolute inset-0 border border-primary/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
             </motion.div>

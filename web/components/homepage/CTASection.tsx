@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import SpotlightButton from '@/components/ui/SpotlightButton';
-import { ArrowRight, Shield, Users, Star, Zap } from 'lucide-react';
+import { motion } from "framer-motion";
+import { Shield, Star, Users, Zap } from "lucide-react";
+import Link from "@/components/AppLink";
+import SpotlightButton from "@/components/ui/SpotlightButton";
 
 export default function CTASection() {
   const stats = [
-    { value: '50K+', label: 'Scans Completed', icon: <Shield size={24} /> },
-    { value: '1M+', label: 'Vulnerabilities Found', icon: <Zap size={24} /> },
-    { value: '5K+', label: 'Active Users', icon: <Users size={24} /> },
-    { value: '99.9%', label: 'Accuracy Rate', icon: <Star size={24} /> },
+    { value: "50K+", label: "Scans Completed", icon: <Shield size={24} /> },
+    { value: "1M+", label: "Vulnerabilities Found", icon: <Zap size={24} /> },
+    { value: "5K+", label: "Active Users", icon: <Users size={24} /> },
+    { value: "99.9%", label: "Accuracy Rate", icon: <Star size={24} /> },
   ];
 
   return (
@@ -29,14 +29,14 @@ export default function CTASection() {
         <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-6 tracking-tight">
           Ready to Secure Your
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent-foreground">
-            {' '}
+            {" "}
             Code?
           </span>
         </h2>
 
         <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-          Join thousands of developers who trust our AI-powered security scanner to protect their
-          applications.
+          Join thousands of developers who trust our AI-powered security scanner
+          to protect their applications.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-6 justify-center mb-20">
@@ -47,7 +47,11 @@ export default function CTASection() {
           >
             Get Started
           </SpotlightButton>
-          <SpotlightButton as={Link} href="/demo" className="hover:bg-muted/10 h-14 px-8 text-lg">
+          <SpotlightButton
+            as={Link}
+            href="/demo"
+            className="hover:bg-muted/10 h-14 px-8 text-lg"
+          >
             View Demo
           </SpotlightButton>
         </div>
@@ -65,7 +69,9 @@ export default function CTASection() {
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-4 group-hover:-translate-y-1 transition-transform duration-300">
                 {stat.icon}
               </div>
-              <div className="text-3xl font-bold text-foreground mb-1">{stat.value}</div>
+              <div className="text-3xl font-bold text-foreground mb-1">
+                {stat.value}
+              </div>
               <div className="text-sm text-muted-foreground">{stat.label}</div>
             </motion.div>
           ))}

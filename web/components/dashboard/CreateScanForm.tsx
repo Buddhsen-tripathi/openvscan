@@ -1,103 +1,114 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { api } from '@/lib/api';
-import { ScanType } from '@openvscan/types';
-import { useRouter } from 'next/navigation';
+import { ScanType } from "@openvscan/types";
+import { useNavigate } from "@tanstack/react-router";
+import { type FormEvent, useState } from "react";
+import { useStartScanMutation } from "@/lib/api";
 
 interface CreateScanFormProps {
   projectId: string;
   onScanStarted?: (scanId: string) => void;
 }
 
-export function CreateScanForm({ projectId, onScanStarted }: CreateScanFormProps) {
-  const [target, setTarget] = useState('');
-  const [scanners, setScanners] = useState<ScanType[]>([ScanType.STATIC_ANALYSIS]);
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+export function CreateScanForm({
+  projectId,
+  onScanStarted,
+}: CreateScanFormProps) {
+  const [target, setTarget] = useState("");
+  const [scanners, setScanners] = useState<ScanType[]>([
+    ScanType.STATIC_ANALYSIS,
+  ]);
+  const navigate = useNavigate();
+  const startScan = useStartScanMutation();
 
   const availableScanners = [
-    { type: ScanType.STATIC_ANALYSIS, label: 'Static Analysis (Trivy)' },
-    { type: ScanType.DEPENDENCY_AUDIT, label: 'Dependency Audit' },
-    { type: ScanType.CONTAINER, label: 'Container Scan' },
-    // DAST not yet implemented in worker map, but let's keep it consistent with types if needed
+    { type: ScanType.STATIC_ANALYSIS, label: "Static Analysis (Semgrep)" },
+    { type: ScanType.DEPENDENCY_AUDIT, label: "Dependency Audit (Trivy)" },
+    { type: ScanType.CONTAINER, label: "Container Scan (Trivy)" },
+    { type: ScanType.DAST, label: "DAST (OWASP ZAP)" },
   ];
 
   const handleScannerToggle = (type: ScanType) => {
-    setScanners((prev) => (prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]));
+    setScanners((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
+    );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!target) return;
     if (scanners.length === 0) {
-      alert('Please select at least one scanner');
+      alert("Please select at least one scanner");
       return;
     }
 
-    setIsLoading(true);
     try {
-      const { data, error } = await api.scans.start(projectId, target, scanners);
-
-      if (error) {
-        alert('Failed to start scan');
-        console.error(error);
-        return;
+      const data = await startScan.mutateAsync({ projectId, target, scanners });
+      if (onScanStarted) {
+        onScanStarted(data.scanId);
+      } else {
+        navigate({ to: "/dashboard/scans/$id", params: { id: data.scanId } });
       }
-
-      if (data) {
-        if (onScanStarted) {
-          onScanStarted(data.scanId);
-        } else {
-          router.push(`/dashboard/scans/${data.scanId}`);
-        }
-      }
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      alert("Failed to start scan");
+      console.error(error);
     }
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-      <h3 className="text-lg font-bold mb-4">Start New Scan</h3>
+    <div className="rounded-xl p-5 border border-border/60 bg-card">
+      <h3 className="text-lg font-bold text-card-foreground mb-4">
+        Start New Scan
+      </h3>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="scan-target"
+            className="block text-sm font-medium text-muted-foreground mb-1.5"
+          >
             Target URL / Repository / Image
           </label>
           <input
+            id="scan-target"
             type="text"
             required
             value={target}
             onChange={(e) => setTarget(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground/50 transition-all"
             placeholder="e.g., https://github.com/expressjs/express or nginx:latest"
           />
         </div>
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Scanners</label>
-          <div className="space-y-2">
+        <fieldset className="mb-6">
+          <legend className="block text-sm font-medium text-muted-foreground mb-2">
+            Scanners
+          </legend>
+          <div className="space-y-2.5">
             {availableScanners.map(({ type, label }) => (
-              <label key={type} className="flex items-center space-x-2 cursor-pointer">
+              <label
+                key={type}
+                className="flex items-center space-x-2.5 cursor-pointer group"
+              >
                 <input
                   type="checkbox"
                   checked={scanners.includes(type)}
                   onChange={() => handleScannerToggle(type)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-input accent-primary focus:ring-ring"
                 />
-                <span className="text-gray-700">{label}</span>
+                <span className="text-sm text-foreground group-hover:text-primary transition-colors">
+                  {label}
+                </span>
               </label>
             ))}
           </div>
-        </div>
+        </fieldset>
 
         <button
           type="submit"
-          disabled={isLoading || !target || scanners.length === 0}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
+          disabled={startScan.isPending || !target || scanners.length === 0}
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-4 rounded-lg transition-colors disabled:opacity-50 text-sm"
         >
-          {isLoading ? 'Starting Scan...' : 'Start Scan'}
+          {startScan.isPending ? "Starting Scan..." : "Start Scan"}
         </button>
       </form>
     </div>

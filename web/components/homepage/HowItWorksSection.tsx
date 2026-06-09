@@ -1,31 +1,32 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { GitBranch, Search, ShieldCheck, FileText } from 'lucide-react';
+import { motion } from "framer-motion";
+import { FileText, GitBranch, Search, ShieldCheck } from "lucide-react";
 
 const steps = [
   {
     icon: GitBranch,
-    title: 'Connect Repo or Upload Zip',
+    title: "Connect Repo or Upload Zip",
     description:
-      'Link your GitHub or GitLab repository, or simply upload a zip file of your source code.',
+      "Link your GitHub or GitLab repository, or simply upload a zip file of your source code.",
   },
   {
     icon: Search,
-    title: 'Run Scans',
-    description: 'Initiate a scan manually or set up automated scans on every pull request.',
+    title: "Run Scans",
+    description:
+      "Initiate a scan manually or set up automated scans on every pull request.",
   },
   {
     icon: ShieldCheck,
-    title: 'AI Analysis',
+    title: "AI Analysis",
     description:
-      'Our AI engine analyzes the results, filtering out false positives and prioritizing critical issues.',
+      "Our AI engine analyzes the results, filtering out false positives and prioritizing critical issues.",
   },
   {
     icon: FileText,
-    title: 'Get Report',
+    title: "Get Report",
     description:
-      'Receive a comprehensive report with actionable remediation steps to fix vulnerabilities.',
+      "Receive a comprehensive report with actionable remediation steps to fix vulnerabilities.",
   },
 ];
 
@@ -49,12 +50,13 @@ export default function HowItWorksSection() {
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-tight">
             How OpenVScan
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent-foreground">
-              {' '}
+              {" "}
               Works
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Secure your application in four simple steps. No complex configuration required.
+            Secure your application in four simple steps. No complex
+            configuration required.
           </p>
         </motion.div>
 
@@ -82,7 +84,9 @@ export default function HowItWorksSection() {
                 {step.title}
               </h3>
 
-              <p className="text-muted-foreground leading-relaxed">{step.description}</p>
+              <p className="text-muted-foreground leading-relaxed">
+                {step.description}
+              </p>
             </motion.div>
           ))}
         </div>

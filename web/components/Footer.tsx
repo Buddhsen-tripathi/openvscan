@@ -1,30 +1,39 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import { Github, Twitter, Linkedin } from 'lucide-react';
+import { Github } from "lucide-react";
+import Image from "@/components/AppImage";
+import Link from "@/components/AppLink";
 
 const socialLinks = [
   {
-    href: 'https://github.com/Buddhsen-tripathi/openvscan',
+    href: "https://github.com/Buddhsen-tripathi/openvscan",
     icon: <Github className="w-5 h-5" />,
-    label: 'GitHub',
+    label: "GitHub",
   },
   // Add other social links here
 ];
 
 const footerNav = {
   product: [
-    { href: '/#features', label: 'Features' },
-    { href: '/docs', label: 'Docs' },
+    { href: "/#features", label: "Features" },
+    { href: "/docs", label: "Docs" },
   ],
   community: [
-    { href: 'https://github.com/Buddhsen-tripathi/openvscan', label: 'Star on GitHub' },
-    { href: 'https://github.com/Buddhsen-tripathi/openvscan/issues', label: 'Report an Issue' },
-    { href: 'https://github.com/Buddhsen-tripathi/openvscan/discussions', label: 'Discussions' },
+    {
+      href: "https://github.com/Buddhsen-tripathi/openvscan",
+      label: "Star on GitHub",
+    },
+    {
+      href: "https://github.com/Buddhsen-tripathi/openvscan/issues",
+      label: "Report an Issue",
+    },
+    {
+      href: "https://github.com/Buddhsen-tripathi/openvscan/discussions",
+      label: "Discussions",
+    },
   ],
   company: [
-    { href: '/about', label: 'About' },
-    { href: '/blog', label: 'Blog' },
-    { href: '/contact', label: 'Contact' },
+    { href: "/about", label: "About" },
+    { href: "/blog", label: "Blog" },
+    { href: "/contact", label: "Contact" },
   ],
 };
 
@@ -43,7 +52,9 @@ export default function Footer() {
                 height={32}
                 className="rounded-md"
               />
-              <span className="text-xl font-semibold text-foreground">OpenVScan</span>
+              <span className="text-xl font-semibold text-foreground">
+                OpenVScan
+              </span>
             </Link>
             <p className="text-sm text-muted-foreground">
               Smarter, faster pre-production security testing.
@@ -52,7 +63,9 @@ export default function Footer() {
 
           {/* Navigation Links */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4">Product</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-4">
+              Product
+            </h3>
             <ul className="space-y-3">
               {footerNav.product.map((item) => (
                 <li key={item.label}>
@@ -67,7 +80,9 @@ export default function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4">Community</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-4">
+              Community
+            </h3>
             <ul className="space-y-3">
               {footerNav.community.map((item) => (
                 <li key={item.label}>
@@ -84,7 +99,9 @@ export default function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4">Company</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-4">
+              Company
+            </h3>
             <ul className="space-y-3">
               {footerNav.company.map((item) => (
                 <li key={item.label}>

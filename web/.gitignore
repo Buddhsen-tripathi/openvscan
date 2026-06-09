@@ -13,8 +13,9 @@
 # testing
 /coverage
 
-# next.js
-/.next/
+# build outputs
+/.wrangler/
+/dist/
 /out/
 
 # production
@@ -33,11 +34,5 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
-# vercel
-.vercel
-.vercel/output
-.open-next
-
 # typescript
 *.tsbuildinfo
-next-env.d.ts

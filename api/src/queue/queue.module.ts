@@ -16,6 +16,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
     BullModule.registerQueue({
       name: 'scan-queue',
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 5000,
+        },
+        removeOnComplete: { count: 100 },
+        removeOnFail: { count: 500 },
+      },
     }),
   ],
   exports: [BullModule],

@@ -1,6 +1,9 @@
 import { Job } from 'bullmq';
 import { ScanStatus, ScanType } from '@openvscan/types';
 import { TrivyScanner } from '../scanners/trivy.scanner';
+import { NmapScanner } from '../scanners/nmap.scanner';
+import { SemgrepScanner } from '../scanners/semgrep.scanner';
+import { ZapScanner } from '../scanners/zap.scanner';
 import { Scanner } from '../scanners/base.scanner';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
@@ -21,11 +24,13 @@ export class ScanProcessor {
     // Initialize AI Service
     this.aiService = new AiService();
 
-    // Register available scanners
-    const trivy = new TrivyScanner();
-    this.scanners.set(ScanType.STATIC_ANALYSIS, trivy);
-    this.scanners.set(ScanType.DEPENDENCY_AUDIT, trivy);
-    this.scanners.set(ScanType.CONTAINER, trivy);
+    // Register available scanners with proper routing
+    this.scanners.set(ScanType.DEPENDENCY_AUDIT, new TrivyScanner());
+    this.scanners.set(ScanType.CONTAINER, new TrivyScanner());
+    this.scanners.set(ScanType.STATIC_ANALYSIS, new SemgrepScanner());
+    this.scanners.set(ScanType.DAST, new ZapScanner());
+    // Nmap is available as a supplementary network scanner
+    this.scanners.set('network', new NmapScanner());
   }
 
   async process(job: Job) {
@@ -57,7 +62,8 @@ export class ScanProcessor {
           
           const result = await scanner.scan(target, config);
           
-          // Enrich findings with AI analysis
+          // Enrich findings with AI analysis (critical/high only)
+          const enableAi = config.enableAi !== false; // enabled by default
           const enrichedFindings = await Promise.all(result.findings.map(async (f) => {
             const finding = {
               id: crypto.randomUUID(),
@@ -70,9 +76,14 @@ export class ScanProcessor {
               tool: f.tool,
             };
 
-            // Optional: Call AI service for critical/high severity findings to save tokens/time
-            // For now, let's log that we would call it. 
-            // Real implementation: finding.remediation = await this.aiService.analyzeFinding(f);
+            // AI-enrich critical/high findings when enabled
+            if (enableAi && this.aiService.isEnabled() && this.aiService.shouldAnalyze(f)) {
+              try {
+                finding.remediation = await this.aiService.analyzeFinding(f);
+              } catch (e) {
+                console.warn(`[Scan ${scanId}] AI enrichment failed for finding, using default remediation`);
+              }
+            }
             
             return finding;
           }));
@@ -83,9 +94,18 @@ export class ScanProcessor {
           }
           
           results.push(...result.findings);
+          await this.log(scanId, 'info', `${scanner.name} found ${result.findings.length} issue(s)`);
         } else {
           console.warn(`[Scan ${scanId}] Scanner ${scanner.name} is not available in the environment`);
           await this.log(scanId, 'warn', `Scanner ${scanner.name} is not available`);
+        }
+      }
+
+      // Log AI usage stats if AI was used
+      if (this.aiService.isEnabled()) {
+        const stats = this.aiService.getUsageStats();
+        if (stats.totalCalls > 0) {
+          await this.log(scanId, 'info', `AI analysis: ${stats.totalCalls} calls, ${stats.totalInputTokens + stats.totalOutputTokens} tokens used`);
         }
       }
 
@@ -97,6 +117,8 @@ export class ScanProcessor {
           updatedAt: new Date() 
         })
         .where(eq(schema.scan.id, scanId));
+
+      await this.log(scanId, 'info', `Scan completed with ${results.length} total finding(s)`);
 
       return {
         status: ScanStatus.COMPLETED,

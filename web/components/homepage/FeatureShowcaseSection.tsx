@@ -1,61 +1,61 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { motion } from "framer-motion";
 import {
-  Shield,
-  Zap,
-  Search,
-  FileCode,
-  CheckCircle2,
   AlertTriangle,
   Bug,
+  CheckCircle2,
+  FileCode,
   GitBranch,
-  Package,
   Loader2,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  Package,
+  Search,
+  Shield,
+  Zap,
+} from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 const scanningSteps = [
   {
     id: 1,
-    title: 'Connect Repo / Upload Zip',
-    description: 'Connect repository or upload zip file',
+    title: "Connect Repo / Upload Zip",
+    description: "Connect repository or upload zip file",
     icon: FileCode,
-    status: 'completed',
-    duration: '2s',
+    status: "completed",
+    duration: "2s",
   },
   {
     id: 2,
-    title: 'AI Analysis',
-    description: 'AI scans for vulnerabilities',
+    title: "AI Analysis",
+    description: "AI scans for vulnerabilities",
     icon: Search,
-    status: 'running',
-    duration: '15s',
+    status: "running",
+    duration: "15s",
   },
   {
     id: 3,
-    title: 'Dependency Check',
-    description: 'Scan third-party packages',
+    title: "Dependency Check",
+    description: "Scan third-party packages",
     icon: Package,
-    status: 'pending',
-    duration: '8s',
+    status: "pending",
+    duration: "8s",
   },
   {
     id: 4,
-    title: 'Security Report',
-    description: 'Generate detailed findings',
+    title: "Security Report",
+    description: "Generate detailed findings",
     icon: Shield,
-    status: 'pending',
-    duration: '5s',
+    status: "pending",
+    duration: "5s",
   },
 ];
 
 const mockResults = [
-  { type: 'critical', count: 2, description: 'SQL Injection vulnerabilities' },
-  { type: 'high', count: 5, description: 'Cross-site scripting issues' },
-  { type: 'medium', count: 12, description: 'Insecure dependencies' },
-  { type: 'low', count: 8, description: 'Code quality improvements' },
+  { type: "critical", count: 2, description: "SQL Injection vulnerabilities" },
+  { type: "high", count: 5, description: "Cross-site scripting issues" },
+  { type: "medium", count: 12, description: "Insecure dependencies" },
+  { type: "low", count: 8, description: "Code quality improvements" },
 ];
 
 export default function FeatureShowcaseSection() {
@@ -79,25 +79,27 @@ export default function FeatureShowcaseSection() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'completed':
+      case "completed":
         return <CheckCircle2 className="w-5 h-5 text-green-500" />;
-      case 'running':
+      case "running":
         return <Loader2 className="w-5 h-5 text-primary animate-spin" />;
       default:
-        return <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/20" />;
+        return (
+          <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/20" />
+        );
     }
   };
 
   const getSeverityColor = (type: string) => {
     switch (type) {
-      case 'critical':
-        return 'text-red-500 bg-red-500/10 border-red-500/20';
-      case 'high':
-        return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
-      case 'medium':
-        return 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20';
+      case "critical":
+        return "text-red-500 bg-red-500/10 border-red-500/20";
+      case "high":
+        return "text-orange-500 bg-orange-500/10 border-orange-500/20";
+      case "medium":
+        return "text-yellow-500 bg-yellow-500/10 border-yellow-500/20";
       default:
-        return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+        return "text-blue-500 bg-blue-500/10 border-blue-500/20";
     }
   };
 
@@ -116,13 +118,13 @@ export default function FeatureShowcaseSection() {
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-tight">
             See It In
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent-foreground">
-              {' '}
+              {" "}
               Action
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Watch how our AI-powered security scanner analyzes your code in real-time and provides
-            actionable insights.
+            Watch how our AI-powered security scanner analyzes your code in
+            real-time and provides actionable insights.
           </p>
         </motion.div>
 
@@ -139,7 +141,9 @@ export default function FeatureShowcaseSection() {
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
               <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="ml-4 text-sm text-muted-foreground font-mono">Security Scanner</span>
+              <span className="ml-4 text-sm text-muted-foreground font-mono">
+                Security Scanner
+              </span>
             </div>
 
             <div className="space-y-4">
@@ -148,31 +152,39 @@ export default function FeatureShowcaseSection() {
                   key={step.id}
                   variants={itemVariants}
                   className={cn(
-                    'flex items-start gap-4 p-4 rounded-xl transition-all border',
-                    step.status === 'completed'
-                      ? 'bg-green-500/5 border-green-500/20'
-                      : step.status === 'running'
-                        ? 'bg-primary/5 border-primary/20'
-                        : 'bg-muted/30 border-transparent',
+                    "flex items-start gap-4 p-4 rounded-xl transition-all border",
+                    step.status === "completed"
+                      ? "bg-green-500/5 border-green-500/20"
+                      : step.status === "running"
+                        ? "bg-primary/5 border-primary/20"
+                        : "bg-muted/30 border-transparent",
                   )}
                 >
-                  <div className="flex-shrink-0 mt-1">{getStatusIcon(step.status)}</div>
+                  <div className="flex-shrink-0 mt-1">
+                    {getStatusIcon(step.status)}
+                  </div>
                   <div className="flex-1">
-                    <h4 className="font-medium text-foreground">{step.title}</h4>
-                    <p className="text-sm text-muted-foreground">{step.description}</p>
-                    {step.status === 'running' && (
-                      <p className="text-xs text-primary mt-1 font-mono">Processing...</p>
+                    <h4 className="font-medium text-foreground">
+                      {step.title}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      {step.description}
+                    </p>
+                    {step.status === "running" && (
+                      <p className="text-xs text-primary mt-1 font-mono">
+                        Processing...
+                      </p>
                     )}
                   </div>
                   <div className="flex-shrink-0">
                     <step.icon
                       className={cn(
-                        'w-5 h-5',
-                        step.status === 'completed'
-                          ? 'text-green-500'
-                          : step.status === 'running'
-                            ? 'text-primary'
-                            : 'text-muted-foreground/40',
+                        "w-5 h-5",
+                        step.status === "completed"
+                          ? "text-green-500"
+                          : step.status === "running"
+                            ? "text-primary"
+                            : "text-muted-foreground/40",
                       )}
                     />
                   </div>
@@ -183,14 +195,16 @@ export default function FeatureShowcaseSection() {
             <div className="mt-8 pt-6 border-t border-border/50">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium">Overall Progress</span>
-                <span className="text-sm text-muted-foreground font-mono">50%</span>
+                <span className="text-sm text-muted-foreground font-mono">
+                  50%
+                </span>
               </div>
               <div className="w-full bg-muted/50 rounded-full h-2 overflow-hidden">
                 <motion.div
                   className="bg-gradient-to-r from-primary to-accent-foreground h-2 rounded-full"
                   initial={{ width: 0 }}
-                  animate={{ width: '50%' }}
-                  transition={{ duration: 2, ease: 'easeOut' }}
+                  animate={{ width: "50%" }}
+                  transition={{ duration: 2, ease: "easeOut" }}
                 />
               </div>
             </div>
@@ -205,7 +219,9 @@ export default function FeatureShowcaseSection() {
             className="space-y-6"
           >
             <div>
-              <h3 className="text-2xl font-bold text-foreground mb-4">Security Report</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-4">
+                Security Report
+              </h3>
               <p className="text-muted-foreground mb-6">
                 Comprehensive analysis results with actionable recommendations.
               </p>
@@ -224,7 +240,9 @@ export default function FeatureShowcaseSection() {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4" />
-                      <span className="font-medium capitalize">{result.type}</span>
+                      <span className="font-medium capitalize">
+                        {result.type}
+                      </span>
                     </div>
                     <span className="text-2xl font-bold">{result.count}</span>
                   </div>
@@ -243,7 +261,9 @@ export default function FeatureShowcaseSection() {
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>Use parameterized queries to prevent SQL injection</span>
+                  <span>
+                    Use parameterized queries to prevent SQL injection
+                  </span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />

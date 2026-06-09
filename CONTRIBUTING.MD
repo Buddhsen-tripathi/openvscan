@@ -78,8 +78,10 @@ NODE_ENV=development
 
 **Web Configuration** (`web/.env.local`):
 ```bash
-NEXT_PUBLIC_API_URL=http://localhost:5000
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+VITE_API_URL=http://localhost:5000
+VITE_APP_URL=http://localhost:3000
+BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_SECRET=your-secret-key
 ```
 
 ### 3. Start Development Environment
@@ -126,10 +128,12 @@ openvscan/
 │   │   └── main.ts   # Application entry
 │   ├── test/         # API tests
 │   └── package.json
-├── web/              # Next.js 15 / React 19 frontend
-│   ├── app/          # App router pages
+├── web/              # TanStack Start / React 19 frontend
+│   ├── src/routes/   # TanStack Router routes
 │   ├── components/   # React components
 │   ├── lib/          # Utilities and hooks
+│   ├── vite.config.ts
+│   ├── wrangler.jsonc
 │   └── package.json
 ├── deploy/           # Deployment manifests
 ├── docker/           # Docker configurations
@@ -219,10 +223,10 @@ export class ScansController {
 }
 ```
 
-### Web (Next.js/React)
+### Web (TanStack Start/React)
 
-- Use **React Server Components** where possible
-- Follow **Next.js 15 App Router** conventions
+- Use **TanStack Router** file routes in `web/src/routes`
+- Use **TanStack Query** for dashboard server state
 - Use **Tailwind CSS** for styling (avoid inline styles)
 - Create **reusable components** in the `components/` directory
 - Use **TypeScript interfaces** for props
@@ -441,7 +445,7 @@ Contributors will be recognized in:
 
 ## License
 
-By contributing to OpenVScan, you agree that your contributions will be licensed under the Apache License 2.0.
+By contributing to OpenVScan, you agree that your contributions will be licensed under the GNU Affero General Public License v3.0 only.
 
 ---
 

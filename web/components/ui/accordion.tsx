@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { ChevronDown } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
 const AccordionContext = React.createContext<{
   value?: string;
@@ -11,7 +11,7 @@ const AccordionContext = React.createContext<{
 }>({});
 
 interface AccordionProps {
-  type?: 'single' | 'multiple';
+  type?: "single" | "multiple";
   collapsible?: boolean;
   value?: string;
   defaultValue?: string;
@@ -28,17 +28,21 @@ const Accordion = ({
   onValueChange,
   ...props
 }: AccordionProps) => {
-  const [value, setValue] = React.useState(controlledValue || defaultValue || '');
+  const [value, setValue] = React.useState(
+    controlledValue || defaultValue || "",
+  );
 
   const handleValueChange = (newValue: string) => {
-    const updatedValue = newValue === value ? '' : newValue;
+    const updatedValue = newValue === value ? "" : newValue;
     setValue(updatedValue);
     onValueChange?.(updatedValue);
   };
 
   return (
-    <AccordionContext.Provider value={{ value, onValueChange: handleValueChange }}>
-      <div className={cn('space-y-2', className)} {...props}>
+    <AccordionContext.Provider
+      value={{ value, onValueChange: handleValueChange }}
+    >
+      <div className={cn("space-y-2", className)} {...props}>
         {children}
       </div>
     </AccordionContext.Provider>
@@ -49,9 +53,14 @@ const AccordionItem = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & { value: string }
 >(({ className, value, ...props }, ref) => (
-  <div ref={ref} className={cn('border-b', className)} data-value={value} {...props} />
+  <div
+    ref={ref}
+    className={cn("border-b", className)}
+    data-value={value}
+    {...props}
+  />
 ));
-AccordionItem.displayName = 'AccordionItem';
+AccordionItem.displayName = "AccordionItem";
 
 const AccordionTrigger = React.forwardRef<
   HTMLButtonElement,
@@ -69,10 +78,10 @@ const AccordionTrigger = React.forwardRef<
               ref={ref}
               onClick={() => onValueChange?.(itemContext.value)}
               className={cn(
-                'flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180',
+                "flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
                 className,
               )}
-              data-state={isOpen ? 'open' : 'closed'}
+              data-state={isOpen ? "open" : "closed"}
               {...props}
             >
               {children}
@@ -84,53 +93,65 @@ const AccordionTrigger = React.forwardRef<
     </AccordionItemContext.Consumer>
   );
 });
-AccordionTrigger.displayName = 'AccordionTrigger';
+AccordionTrigger.displayName = "AccordionTrigger";
 
-const AccordionContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, children, ...props }, ref) => {
-    const { value } = React.useContext(AccordionContext);
+const AccordionContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, children, ...props }, ref) => {
+  const { value } = React.useContext(AccordionContext);
 
-    return (
-      <AccordionItemContext.Consumer>
-        {(itemContext) => {
-          const isOpen = value === itemContext.value;
-          return (
-            <AnimatePresence initial={false}>
-              {isOpen && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
+  return (
+    <AccordionItemContext.Consumer>
+      {(itemContext) => {
+        const isOpen = value === itemContext.value;
+        return (
+          <AnimatePresence initial={false}>
+            {isOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div
+                  ref={ref}
+                  className={cn("pb-4 pt-0", className)}
+                  {...props}
                 >
-                  <div ref={ref} className={cn('pb-4 pt-0', className)} {...props}>
-                    {children}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          );
-        }}
-      </AccordionItemContext.Consumer>
-    );
-  },
-);
-AccordionContent.displayName = 'AccordionContent';
+                  {children}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        );
+      }}
+    </AccordionItemContext.Consumer>
+  );
+});
+AccordionContent.displayName = "AccordionContent";
 
 // Helper context for Item
-const AccordionItemContext = React.createContext<{ value: string }>({ value: '' });
+const AccordionItemContext = React.createContext<{ value: string }>({
+  value: "",
+});
 
 const AccordionItemWrapper = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & { value: string }
 >(({ className, value, children, ...props }, ref) => (
   <AccordionItemContext.Provider value={{ value }}>
-    <div ref={ref} className={cn('border-b', className)} {...props}>
+    <div ref={ref} className={cn("border-b", className)} {...props}>
       {children}
     </div>
   </AccordionItemContext.Provider>
 ));
-AccordionItemWrapper.displayName = 'AccordionItem';
+AccordionItemWrapper.displayName = "AccordionItem";
 
-export { Accordion, AccordionItemWrapper as AccordionItem, AccordionTrigger, AccordionContent };
+export {
+  Accordion,
+  AccordionItemWrapper as AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+};

@@ -33,6 +33,7 @@ export interface ScanConfig {
   target: string;
   scanners: ScanType[];
   maxDuration?: number;
+  enableAi?: boolean;
 }
 
 export interface Scan {

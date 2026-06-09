@@ -1,38 +1,38 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
+} from "@/components/ui/accordion";
 
 const faqs = [
   {
-    question: 'How does the AI analysis work?',
+    question: "How does the AI analysis work?",
     answer:
-      'Our AI engine is trained on millions of security vulnerabilities and code patterns. It analyzes the raw output from open-source scanners to filter out false positives, prioritize critical issues, and provide context-aware remediation suggestions.',
+      "Our AI engine is trained on millions of security vulnerabilities and code patterns. It analyzes the raw output from open-source scanners to filter out false positives, prioritize critical issues, and provide context-aware remediation suggestions.",
   },
   {
-    question: 'Can I use OpenVScan for private repositories?',
+    question: "Can I use OpenVScan for private repositories?",
     answer:
-      'Yes! OpenVScan supports both public and private repositories on GitHub and GitLab. We use secure OAuth integration to access your code only when necessary for scanning.',
+      "Yes! OpenVScan supports both public and private repositories on GitHub and GitLab. We use secure OAuth integration to access your code only when necessary for scanning.",
   },
   {
-    question: 'What languages and frameworks are supported?',
+    question: "What languages and frameworks are supported?",
     answer:
-      'We support a wide range of languages including JavaScript/TypeScript, Python, Java, Go, Ruby, PHP, and more. We also have specialized scanners for frameworks like React, Next.js, Django, Spring Boot, etc.',
+      "We support a wide range of languages including JavaScript/TypeScript, Python, Java, Go, Ruby, PHP, and more. We also have specialized scanners for frameworks like React, Next.js, Django, Spring Boot, etc.",
   },
   {
-    question: 'Is OpenVScan free to use?',
+    question: "Is OpenVScan free to use?",
     answer:
-      'OpenVScan is open-source and free to self-host. We also offer a managed cloud version with a free tier for individual developers and open-source projects.',
+      "OpenVScan is open-source and free to self-host. We also offer a managed cloud version with a free tier for individual developers and open-source projects.",
   },
   {
-    question: 'How do I integrate OpenVScan into my CI/CD pipeline?',
+    question: "How do I integrate OpenVScan into my CI/CD pipeline?",
     answer:
-      'We provide a CLI tool and ready-to-use actions/plugins for GitHub Actions, GitLab CI, Jenkins, and other popular CI/CD platforms. You can set it up in minutes.',
+      "We provide a CLI tool and ready-to-use actions/plugins for GitHub Actions, GitLab CI, Jenkins, and other popular CI/CD platforms. You can set it up in minutes.",
   },
 ];
 
@@ -53,11 +53,13 @@ export default function FAQSection() {
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-tight">
             Frequently Asked
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent-foreground">
-              {' '}
+              {" "}
               Questions
             </span>
           </h2>
-          <p className="text-lg text-muted-foreground">Got questions? We&apos;ve got answers.</p>
+          <p className="text-lg text-muted-foreground">
+            Got questions? We&apos;ve got answers.
+          </p>
         </motion.div>
 
         <motion.div

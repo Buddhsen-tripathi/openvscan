@@ -1,34 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OpenVScan Web
+
+OpenVScan Web is a TanStack Start app built with React 19, TanStack Router, TanStack Query, Tailwind CSS, Better Auth, and Cloudflare Workers.
 
 ## Getting Started
 
-First, run the development server:
+From the repository root, run:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm run dev:web
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Routes live in `src/routes`, shared UI lives in `components`, and API/auth helpers live in `lib`.
 
-## Learn More
+## Environment
 
-To learn more about Next.js, take a look at the following resources:
+```env
+DATABASE_URL="..."
+BETTER_AUTH_SECRET="..."
+BETTER_AUTH_URL=http://localhost:3000
+VITE_APP_URL=http://localhost:3000
+VITE_API_URL=http://localhost:5000
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Commands
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm dev        # Vite dev server
+pnpm build      # TanStack Start build + TypeScript check
+pnpm preview    # Vite preview
+pnpm deploy     # Build and deploy with Wrangler
+pnpm cf-typegen # Generate Cloudflare Worker env types
+```
 
-## Deploy on Vercel
+## Cloudflare Workers
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deployment is configured in `wrangler.jsonc`. The app keeps authentication on Better Auth and talks to the NestJS API with `credentials: 'include'` so the `better-auth.session_token` cookie remains available to the API.

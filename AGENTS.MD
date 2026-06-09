@@ -4,9 +4,9 @@
 
 **OpenVScan** is a web-based vulnerability scanner that integrates open-source security tools with AI to deliver smarter, faster, and more reliable pre-production security testing. The platform combines trusted security scanners (OWASP ZAP, Nmap, Trivy) with AI-driven analysis for vulnerability deduplication, triage, and remediation guidance.
 
-**Repository**: https://github.com/Buddhsen-tripathi/openvscan  
-**Creator**: Buddhsen Tripathi  
-**License**: Apache License 2.0  
+**Repository**: https://github.com/Buddhsen-tripathi/openvscan
+**Creator**: Buddhsen Tripathi
+**License**: GNU Affero General Public License v3.0 only
 **Live Preview**: https://openvscan-web.buddhsen-work.workers.dev/
 
 ---
@@ -17,7 +17,7 @@ OpenVScan follows a modern full-stack architecture with clear separation of conc
 
 | Tier | Stack | Responsibilities |
 |------|-------|------------------|
-| **UI** (`web/`) | Next.js 15, React 19, Tailwind CSS | Scan setup, dashboards, reporting, multi-tenant UX |
+| **UI** (`web/`) | TanStack Start, React 19, Tailwind CSS, Cloudflare Workers | Scan setup, dashboards, reporting, multi-tenant UX |
 | **API** (`api/`) | NestJS 11, TypeScript, PostgreSQL ORM | Projects, auth, scan orchestration, findings API |
 | **Workers** (`workers/`) | Node.js, BullMQ, Redis | Execute scanners, aggregate artifacts, stream telemetry |
 | **Storage** | PostgreSQL, Redis | Metadata, artifacts, coordination primitives |
@@ -31,38 +31,45 @@ OpenVScan follows a modern full-stack architecture with clear separation of conc
 openvscan/
 ├── api/                    # NestJS 11 backend service
 │   ├── src/
-│   │   ├── common/        # Shared utilities
-│   │   ├── database/      # Database configuration and models
-│   │   │   ├── models/    # Drizzle ORM schemas
-│   │   │   ├── database.module.ts
-│   │   │   └── drizzle.provider.ts
-│   │   ├── queue/         # BullMQ configuration
-│   │   ├── scan/          # Scan module
-│   │   ├── app.module.ts  # Root application module
+│   │   ├── common/        # AuthGuard, exception filter, logging interceptor
+│   │   ├── database/      # Drizzle provider + module (schema in packages/db)
+│   │   ├── queue/         # BullMQ configuration (retry, backoff)
+│   │   ├── scan/          # Scan CRUD, cancel, export (JSON/SARIF)
+│   │   ├── project/       # Project CRUD with multi-tenant isolation
+│   │   ├── app.module.ts  # Root module (ThrottlerModule for rate limiting)
 │   │   └── main.ts        # Application entry point
 │   ├── database/          # Drizzle migrations
 │   ├── .env               # API environment variables
 │   └── package.json       # Dependencies
 │
-├── web/                   # Next.js 15 / React 19 frontend
-│   ├── app/               # Next.js App Router
-│   ├── components/        # React components
-│   ├── lib/               # Utilities
-│   ├── .env               # Web environment variables
+├── web/                   # TanStack Start / React 19 frontend
+│   ├── src/
+│   │   ├── routes/        # TanStack Router routes + server auth handler
+│   │   ├── lib/           # Start server functions and Worker env helpers
+│   │   └── styles.css     # Tailwind CSS entry
+│   ├── components/
+│   │   ├── dashboard/     # Sidebar, ProjectList, CreateScanForm, DashboardContext
+│   │   └── ui/            # Shared UI components
+│   ├── lib/               # API client, Better Auth, utilities
+│   ├── vite.config.ts     # TanStack Start + Cloudflare Vite plugins
+│   ├── wrangler.jsonc     # Cloudflare Workers deployment
 │   └── package.json       # Dependencies
 │
 ├── workers/               # Worker service
 │   ├── src/
-│   │   └── index.ts       # Worker entry point
+│   │   ├── scanners/      # Trivy, Nmap, Semgrep, ZAP scanners
+│   │   ├── processors/    # Scan processor with AI enrichment
+│   │   ├── ai/            # AI service (multi-provider via AI SDK)
+│   │   └── index.ts       # Worker entry (timeout, concurrency, graceful shutdown)
 │   ├── .env               # Worker environment variables
 │   └── package.json       # Dependencies
 │
-├── packages/              # Shared packages
-│   └── types/             # Shared TypeScript types
+├── packages/
+│   ├── db/                # Shared Drizzle schemas + relations
+│   └── types/             # Shared TypeScript types & enums
 │
 ├── AGENTS.md             # This file - AI agent context guide
 ├── README.md             # Project documentation
-├── IMPLEMENTATION_PLAN.md # Implementation roadmap
 ├── docker-compose.yml    # Infrastructure (Redis)
 └── package.json          # Root scripts
 ```
@@ -73,37 +80,61 @@ openvscan/
 
 ### Backend (API)
 - **Framework**: NestJS 11
-- **Database**: PostgreSQL (Drizzle ORM)
-- **Queue**: BullMQ with Redis
+- **Database**: PostgreSQL (Drizzle ORM with relations)
+- **Queue**: BullMQ with Redis (3 retries, exponential backoff)
+- **Security**: AuthGuard, ThrottlerModule (60 req/min global, 5/min scan creation)
 - **Documentation**: Swagger/OpenAPI
 
 ### Frontend (Web)
-- **Framework**: Next.js 15
-- **UI**: shadcn/ui, Tailwind CSS 4
-- **Auth**: Better-auth
+- **Framework**: TanStack Start on Cloudflare Workers
+- **Routing/Data**: TanStack Router + TanStack Query
+- **UI**: Tailwind CSS 4, Lucide icons
+- **Auth**: Better-auth (email/password)
+- **State**: DashboardContext for user session
 
 ### Workers
-- **Runtime**: Node.js
-- **Queue Client**: BullMQ
-- **Connection**: Redis
+- **Runtime**: Node.js (ES2022 target)
+- **Queue Client**: BullMQ (concurrency: 3)
+- **Scanners**: Trivy, Nmap, Semgrep, OWASP ZAP
+- **AI**: Vercel AI SDK (OpenAI, Anthropic, Google)
+- **Timeout**: Configurable (default 10 minutes)
 
 ---
 
 ## Key Features & Modules
 
-### Authentication System
+### Authentication & Multi-Tenancy
 - Better-auth with email/password authentication
+- AuthGuard on all protected routes
+- User-scoped data isolation (projects, scans, findings)
 - Database tables: `user`, `session`, `account`, `verification`
 
 ### Scan Module (API)
-- Scan orchestration via Queue
+- **Endpoints**: Create, list, get, cancel, export (JSON/SARIF)
+- **Rate limiting**: 5 scan creations per minute per user
 - Database tables: `project`, `scan`, `finding`, `scan_log`
-- Models defined in `api/src/database/models/scan-schema.ts`
+- Schema + relations in `packages/db/src/schema/scan.ts`
 
-### Worker System
-- Dedicated worker service in `workers/`
-- Listens to `scan-queue` in Redis
-- Updates scan status and stores findings
+### Scanner System (Workers)
+- **Trivy**: Dependency audit + container scanning
+- **Semgrep**: Static analysis (SAST)
+- **Nmap**: Network port scanning
+- **OWASP ZAP**: DAST web scanning
+- Scanner availability auto-detected at runtime
+
+### AI Integration
+- Multi-provider support via Vercel AI SDK (`ai`, `@ai-sdk/openai`, `@ai-sdk/anthropic`, `@ai-sdk/google`)
+- Selective enrichment: only critical/high severity findings
+- Per-scan opt-in/out via `enableAi` config
+- Token usage tracking per scan
+
+### Dashboard (Web)
+- Real user name via DashboardContext
+- Scan list with search + status filtering
+- Scan results with export buttons (JSON/SARIF)
+- Cancel running scans from UI
+- Settings page with sign-out
+- Sidebar with Lucide icons
 
 ---
 
@@ -160,13 +191,27 @@ FRONTEND_URL=http://localhost:3000
 
 ### Web (`web/.env`)
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
 DATABASE_URL="..."
+BETTER_AUTH_SECRET="..."
+BETTER_AUTH_URL=http://localhost:3000
+VITE_APP_URL=http://localhost:3000
+VITE_API_URL=http://localhost:5000
 ```
 
 ### Workers (`workers/.env`)
 ```env
 REDIS_URL=redis://localhost:6379
+DATABASE_URL="..."
+SCAN_TIMEOUT_MS=600000
+
+# AI Provider: openai | anthropic | google
+AI_PROVIDER=openai
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-4o-mini
+ANTHROPIC_API_KEY=
+ANTHROPIC_MODEL=claude-sonnet-4-20250514
+GOOGLE_API_KEY=
+GOOGLE_MODEL=gemini-2.0-flash
 ```
 
 ---

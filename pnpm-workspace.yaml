@@ -3,3 +3,11 @@ packages:
   - 'web'
   - 'packages/*'
   - 'workers'
+allowBuilds:
+  '@nestjs/core': true
+  '@scarf/scarf': true
+  esbuild: true
+  msgpackr-extract: true
+  sharp: true
+  unrs-resolver: true
+  workerd: true

@@ -1,13 +1,10 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { Marquee } from '@/components/ui/Marquee';
-import { SplitText, BlurText } from '@/components/ui/TextAnimations';
-import SpotlightButton from '@/components/ui/SpotlightButton';
-import ColorBends from '@/components/ui/ColorBends';
-import { Shield, Zap, Code2, Lock, Terminal, Database } from 'lucide-react';
+import { motion } from "framer-motion";
+import Link from "@/components/AppLink";
+import ColorBends from "@/components/ui/ColorBends";
+import SpotlightButton from "@/components/ui/SpotlightButton";
+import { BlurText, SplitText } from "@/components/ui/TextAnimations";
 
 export default function HeroSection() {
   return (

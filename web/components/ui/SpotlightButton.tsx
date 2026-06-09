@@ -1,10 +1,12 @@
-'use client';
+"use client";
 
-import React, { useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { motion } from "framer-motion";
+import type React from "react";
+import { useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 
-interface SpotlightButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface SpotlightButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   as?: React.ElementType;
   href?: string;
   children: React.ReactNode;
@@ -12,7 +14,7 @@ interface SpotlightButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElem
 }
 
 export default function SpotlightButton({
-  as: Component = 'button',
+  as: Component = "button",
   className,
   children,
   ...props
@@ -58,7 +60,7 @@ export default function SpotlightButton({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={cn(
-        'relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full border border-input bg-background/50 px-6 font-medium text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background',
+        "relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full border border-input bg-background/50 px-6 font-medium text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
         className,
       )}
       {...props}

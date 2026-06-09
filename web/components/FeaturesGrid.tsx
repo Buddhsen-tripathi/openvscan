@@ -1,38 +1,41 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Bot, Combine, GitBranch, ShieldCheck } from 'lucide-react';
+import { motion } from "framer-motion";
+import { Bot, Combine, GitBranch, ShieldCheck } from "lucide-react";
 
 const features = [
   {
     icon: <Combine className="w-10 h-10 text-primary" />,
-    title: 'Unified Open-Source Power',
+    title: "Unified Open-Source Power",
     description:
-      'Leverages a suite of battle-tested open-source scanners (like Semgrep, Gitleaks, and Trivy) under a single, unified interface.',
+      "Leverages a suite of battle-tested open-source scanners (like Semgrep, Gitleaks, and Trivy) under a single, unified interface.",
   },
   {
     icon: <Bot className="w-10 h-10 text-primary" />,
-    title: 'AI-Driven Analysis',
+    title: "AI-Driven Analysis",
     description:
-      'Our AI engine intelligently analyzes scan results, filtering out false positives and prioritizing the most critical vulnerabilities that require your attention.',
+      "Our AI engine intelligently analyzes scan results, filtering out false positives and prioritizing the most critical vulnerabilities that require your attention.",
   },
   {
     icon: <GitBranch className="w-10 h-10 text-primary" />,
-    title: 'Seamless Git Workflow',
+    title: "Seamless Git Workflow",
     description:
-      'Integrates directly into your development workflow with automated scans on pull requests, providing feedback before code is merged.',
+      "Integrates directly into your development workflow with automated scans on pull requests, providing feedback before code is merged.",
   },
   {
     icon: <ShieldCheck className="w-10 h-10 text-primary" />,
-    title: 'Reliable Pre-Production Testing',
+    title: "Reliable Pre-Production Testing",
     description:
-      'Catch security issues early in the development lifecycle, reducing risk and ensuring you ship more secure code, faster.',
+      "Catch security issues early in the development lifecycle, reducing risk and ensuring you ship more secure code, faster.",
   },
 ];
 
 export default function FeaturesGrid() {
   return (
-    <section id="features" className="relative py-24 bg-background overflow-hidden">
+    <section
+      id="features"
+      className="relative py-24 bg-background overflow-hidden"
+    >
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080801a_1px,transparent_1px),linear-gradient(to_bottom,#8080801a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]"></div>
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -43,11 +46,12 @@ export default function FeaturesGrid() {
           className="text-center mb-20"
         >
           <h2 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl mb-6">
-            Smarter, Faster <span className="text-primary">Security Testing</span>
+            Smarter, Faster{" "}
+            <span className="text-primary">Security Testing</span>
           </h2>
           <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
-            OpenVScan combines the best open-source tools with intelligent automation to secure your
-            code before it ever reaches production.
+            OpenVScan combines the best open-source tools with intelligent
+            automation to secure your code before it ever reaches production.
           </p>
         </motion.div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
@@ -68,8 +72,12 @@ export default function FeaturesGrid() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+                  <h3 className="text-xl font-semibold text-foreground mb-3">
+                    {feature.title}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
                 </div>
               </div>
             </motion.div>
