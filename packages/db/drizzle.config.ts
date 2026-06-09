@@ -1,15 +1,11 @@
 import { defineConfig } from 'drizzle-kit';
-import * as dotenv from 'dotenv';
 
-dotenv.config({ path: '../../.env' }); // Load root env or assume configured via env vars
-
+// SQLite dialect for Cloudflare D1. Migrations are generated into ./migrations
+// and applied to D1 via `wrangler d1 migrations apply openvscan --remote`.
 export default defineConfig({
   schema: 'src/schema/index.ts',
   out: 'migrations',
-  dialect: 'postgresql',
-  dbCredentials: {
-    url: process.env.DATABASE_URL!,
-  },
+  dialect: 'sqlite',
   verbose: true,
   strict: true,
 });

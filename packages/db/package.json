@@ -8,18 +8,13 @@
   "scripts": {
     "build": "tsc",
     "generate": "drizzle-kit generate",
-    "migrate": "drizzle-kit migrate",
     "push": "drizzle-kit push"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
-    "dotenv": "^17.2.3",
-    "drizzle-kit": "^0.31.8",
-    "drizzle-orm": "^0.45.1",
-    "pg": "^8.17.1"
+    "drizzle-orm": "^0.45.1"
   },
   "devDependencies": {
-    "@types/pg": "^8.16.0",
+    "drizzle-kit": "^0.31.8",
     "typescript": "^5.9.3"
   }
 }
