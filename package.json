@@ -5,19 +5,14 @@
   "description": "OpenVScan - Open-source vulnerability scanner with AI-assisted analysis",
   "scripts": {
     "prebuild": "pnpm --filter @openvscan/db build && pnpm --filter @openvscan/types build",
-    "dev": "pnpm prebuild && pnpm run --parallel --filter openvscan-api start:dev --filter openvscan-web dev --filter openvscan-workers dev",
-    "dev:api": "pnpm prebuild && pnpm --filter openvscan-api start:dev",
+    "dev": "pnpm dev:web",
     "dev:web": "pnpm --filter openvscan-web dev",
-    "dev:workers": "pnpm prebuild && pnpm --filter openvscan-workers dev",
-    "build": "pnpm prebuild && pnpm --filter openvscan-api build && pnpm --filter openvscan-web build && pnpm --filter openvscan-workers build",
-    "build:api": "pnpm --filter openvscan-api build",
+    "build": "pnpm prebuild && pnpm --filter openvscan-web build",
     "build:web": "pnpm --filter openvscan-web build",
-    "start": "pnpm --filter openvscan-api start:prod",
-    "lint": "pnpm --filter openvscan-api lint && pnpm --filter openvscan-web lint",
-    "format": "pnpm --filter openvscan-api format && pnpm --filter openvscan-web format",
-    "test": "pnpm --filter openvscan-api test && pnpm --filter openvscan-web test",
-    "test:e2e": "pnpm --filter openvscan-api test:e2e",
-    "test:cov": "pnpm --filter openvscan-api test:cov"
+    "deploy": "pnpm prebuild && pnpm --filter openvscan-web exec wrangler deploy",
+    "db:generate": "pnpm --filter @openvscan/db generate",
+    "db:migrate": "pnpm --filter openvscan-web exec wrangler d1 migrations apply openvscan --remote",
+    "db:migrate:local": "pnpm --filter openvscan-web exec wrangler d1 migrations apply openvscan --local"
   },
   "keywords": [
     "vulnerability-scanner",

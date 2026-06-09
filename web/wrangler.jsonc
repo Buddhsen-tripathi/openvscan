@@ -10,5 +10,27 @@
   "vars": {
     "VITE_API_URL": "http://localhost:5000",
     "VITE_APP_URL": "http://localhost:3000"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "openvscan",
+      "database_id": "8b891571-fba1-4760-b2ba-a7c089b7e816",
+      "migrations_dir": "../packages/db/migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "ARTIFACTS",
+      "bucket_name": "openvscan-artifacts"
+    }
+  ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "SCAN_QUEUE",
+        "queue": "openvscan-scans"
+      }
+    ]
   }
 }

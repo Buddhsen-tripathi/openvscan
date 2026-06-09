@@ -1,4 +1,4 @@
-import { neon } from "@neondatabase/serverless";
+import { env } from "cloudflare:workers";
 import {
   account,
   accountRelations,
@@ -11,40 +11,49 @@ import {
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
-import { drizzle } from "drizzle-orm/neon-http";
-import { getEnv, getRequiredEnv } from "@/src/lib/env";
+import { drizzle } from "drizzle-orm/d1";
+import { getEnv } from "@/src/lib/env";
 
-const appUrl =
-  getEnv("BETTER_AUTH_URL") ??
-  getEnv("VITE_APP_URL") ??
-  "http://localhost:3000";
-const databaseUrl = getRequiredEnv("DATABASE_URL");
+// Lazily constructed so the D1 binding (env.DB) is resolved at request time,
+// not at module-evaluation time (when Worker bindings are not yet populated).
+let cached: ReturnType<typeof betterAuth> | null = null;
 
-const db = drizzle(neon(databaseUrl), {
-  schema: {
-    user,
-    session,
-    account,
-    verification,
-    userRelations,
-    sessionRelations,
-    accountRelations,
-  },
-});
+export function getAuth() {
+  if (cached) return cached;
 
-export const auth = betterAuth({
-  baseURL: appUrl,
-  secret: getEnv("BETTER_AUTH_SECRET"),
-  trustedOrigins: [appUrl],
-  database: drizzleAdapter(db, {
-    provider: "pg",
-    schema: { user, session, account, verification },
-  }),
-  emailAndPassword: {
-    enabled: true,
-    async sendResetPassword(url, user) {
-      console.log("Reset password url:", url);
+  const appUrl =
+    getEnv("BETTER_AUTH_URL") ??
+    getEnv("VITE_APP_URL") ??
+    "http://localhost:3000";
+
+  const db = drizzle(env.DB, {
+    schema: {
+      user,
+      session,
+      account,
+      verification,
+      userRelations,
+      sessionRelations,
+      accountRelations,
     },
-  },
-  plugins: [tanstackStartCookies()],
-});
+  });
+
+  cached = betterAuth({
+    baseURL: appUrl,
+    secret: getEnv("BETTER_AUTH_SECRET"),
+    trustedOrigins: [appUrl],
+    database: drizzleAdapter(db, {
+      provider: "sqlite",
+      schema: { user, session, account, verification },
+    }),
+    emailAndPassword: {
+      enabled: true,
+      async sendResetPassword({ url }) {
+        console.log("Reset password url:", url);
+      },
+    },
+    plugins: [tanstackStartCookies()],
+  });
+
+  return cached;
+}

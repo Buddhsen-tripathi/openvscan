@@ -39,3 +39,7 @@ coverage/
 .cache/
 .temp/
 .tmp/
+
+# Cloudflare local secrets
+.dev.vars
+*.dev.vars

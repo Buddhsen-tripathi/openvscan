@@ -21,6 +21,7 @@ import { Route as DashboardScansRouteImport } from './routes/dashboard.scans'
 import { Route as DashboardScansIdRouteImport } from './routes/dashboard.scans.$id'
 import { Route as DashboardProjectsIdRouteImport } from './routes/dashboard.projects.$id'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiScansIdExportRouteImport } from './routes/api/scans.$id.export'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -82,6 +83,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiScansIdExportRoute = ApiScansIdExportRouteImport.update({
+  id: '/api/scans/$id/export',
+  path: '/api/scans/$id/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/projects/$id': typeof DashboardProjectsIdRoute
   '/dashboard/scans/$id': typeof DashboardScansIdRoute
+  '/api/scans/$id/export': typeof ApiScansIdExportRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/projects/$id': typeof DashboardProjectsIdRoute
   '/dashboard/scans/$id': typeof DashboardScansIdRoute
+  '/api/scans/$id/export': typeof ApiScansIdExportRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/projects/$id': typeof DashboardProjectsIdRoute
   '/dashboard/scans/$id': typeof DashboardScansIdRoute
+  '/api/scans/$id/export': typeof ApiScansIdExportRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/dashboard/projects/$id'
     | '/dashboard/scans/$id'
+    | '/api/scans/$id/export'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/dashboard/projects/$id'
     | '/dashboard/scans/$id'
+    | '/api/scans/$id/export'
   id:
     | '__root__'
     | '/'
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/dashboard/projects/$id'
     | '/dashboard/scans/$id'
+    | '/api/scans/$id/export'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -177,6 +189,7 @@ export interface RootRouteChildren {
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiScansIdExportRoute: typeof ApiScansIdExportRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -265,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/scans/$id/export': {
+      id: '/api/scans/$id/export'
+      path: '/api/scans/$id/export'
+      fullPath: '/api/scans/$id/export'
+      preLoaderRoute: typeof ApiScansIdExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -306,6 +326,7 @@ const rootRouteChildren: RootRouteChildren = {
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiScansIdExportRoute: ApiScansIdExportRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
