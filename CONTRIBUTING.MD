@@ -21,16 +21,15 @@ This project adheres to a Code of Conduct that all contributors are expected to 
 
 ## Getting Started
 
+OpenVScan runs entirely on Cloudflare (Workers, Containers, D1, R2, Queues). See [AGENTS.MD](AGENTS.MD) for an architecture overview.
+
 ### Prerequisites
 
-Before you begin, ensure you have the following installed:
-
-- **Node.js** (v18 or higher)
-- **pnpm** (v8 or higher) - Install with `npm install -g pnpm`
-- **Docker** and **Docker Compose** (for local development)
+- **Node.js** (v22.12 or higher)
+- **pnpm** (v8 or higher) — install with `npm install -g pnpm`
 - **Git**
-- **PostgreSQL** (v14 or higher, or use Docker)
-- **Redis** (or use Docker)
+- A **Cloudflare account** (the Workers Paid plan is required only for the scanner container)
+- **Docker** — only needed to build/run the scanner container locally
 
 ### Fork and Clone
 
@@ -58,88 +57,56 @@ OpenVScan uses pnpm workspaces for monorepo management:
 pnpm install
 ```
 
-### 2. Environment Configuration
-
-Copy the example environment file:
+### 2. Provision Cloudflare Resources
 
 ```bash
-cp .env.example .env
+pnpm --filter openvscan-web exec wrangler login
+pnpm --filter openvscan-web exec wrangler d1 create openvscan
+pnpm --filter openvscan-web exec wrangler r2 bucket create openvscan-artifacts
+pnpm --filter openvscan-web exec wrangler queues create openvscan-scans
 ```
 
-Configure service-specific environment files:
+Copy the printed D1 `database_id` into `web/wrangler.jsonc` and `workers/wrangler.jsonc`.
 
-**API Configuration** (`api/.env`):
-```bash
-DATABASE_URL=postgresql://user:password@localhost:5432/openvscan
-REDIS_URL=redis://localhost:6379
-JWT_SECRET=your-secret-key
-NODE_ENV=development
-```
+### 3. Local Secrets
 
-**Web Configuration** (`web/.env.local`):
-```bash
-VITE_API_URL=http://localhost:5000
-VITE_APP_URL=http://localhost:3000
+Bindings live in `wrangler.jsonc`. Provide secrets for local dev in `web/.dev.vars`:
+
+```env
+BETTER_AUTH_SECRET=your-32-char-secret
 BETTER_AUTH_URL=http://localhost:3000
-BETTER_AUTH_SECRET=your-secret-key
+VITE_APP_URL=http://localhost:3000
 ```
 
-### 3. Start Development Environment
-
-#### Option A: Using Docker (Recommended)
-
-Start all services with Docker Compose:
+### 4. Apply the Schema and Start
 
 ```bash
-docker compose up --build
+pnpm db:migrate:local   # apply migrations to local D1
+pnpm dev:web            # web Worker at http://localhost:3000
 ```
 
-- **UI**: http://localhost:3000
-- **API**: http://localhost:5000
-- **API Docs** (Swagger): http://localhost:5000/docs
+To run scan execution locally, start the scanner Worker in another terminal (requires Docker):
 
-#### Option B: Manual Setup
-
-Start individual services:
-
-**Terminal 1 - API Server:**
 ```bash
-pnpm --filter api start:dev
-```
-
-**Terminal 2 - Web Server:**
-```bash
-pnpm --filter web dev
-```
-
-**Terminal 3 - Database (if not using Docker):**
-```bash
-# Start PostgreSQL and Redis locally
+pnpm --filter openvscan-workers dev
 ```
 
 ## Project Structure
 
 ```
 openvscan/
-├── api/              # NestJS 11 backend service
-│   ├── src/
-│   │   ├── modules/  # Feature modules
-│   │   ├── common/   # Shared utilities
-│   │   └── main.ts   # Application entry
-│   ├── test/         # API tests
-│   └── package.json
-├── web/              # TanStack Start / React 19 frontend
-│   ├── src/routes/   # TanStack Router routes
-│   ├── components/   # React components
-│   ├── lib/          # Utilities and hooks
-│   ├── vite.config.ts
-│   ├── wrangler.jsonc
-│   └── package.json
-├── deploy/           # Deployment manifests
-├── docker/           # Docker configurations
-├── packages/         # Shared libraries (future)
-├── scripts/          # Automation scripts
-└── tests/            # E2E and integration tests
+├── web/              # TanStack Start app on Cloudflare Workers
+│   ├── src/routes/   # routes incl. api/auth/$ and api/scans.$id.export
+│   ├── components/   # auth/, dashboard/, homepage/, ui/
+│   ├── lib/          # auth.ts, db.ts, server.ts (server functions), api.ts
+│   └── wrangler.jsonc
+├── workers/          # Cloudflare consumer Worker (openvscan-scanner)
+│   ├── src/index.ts  # ScannerContainer + queue() handler
+│   └── container/    # Dockerfile (node + Trivy) + server.mjs
+├── packages/
+│   ├── db/           # Drizzle SQLite schema for D1 + migrations
+│   └── types/        # Shared TypeScript types & enums
+└── package.json      # Root scripts
 ```
 
 ## Development Workflow
@@ -167,7 +134,7 @@ git checkout -b feature/your-feature-name
 3. **Commit your changes** with clear, descriptive messages:
 
 ```bash
-git commit -m "feat: add vulnerability deduplication logic"
+git commit -m "feat: add additional scanner integration"
 ```
 
 Use conventional commit messages:
@@ -188,170 +155,63 @@ git rebase upstream/main
 
 ## Coding Guidelines
 
-### TypeScript/JavaScript
+### TypeScript
 
 - Use **TypeScript** for all new code
-- Follow **ESLint** rules configured in the project
 - Use **async/await** instead of callbacks or raw promises
-- Prefer **functional programming** patterns where appropriate
-- Write **self-documenting code** with clear variable and function names
+- Prefer **functional** patterns where appropriate
+- Write **self-documenting code** with clear names
 
-### API (NestJS)
+### Web & data access (`web/`)
 
-- Follow NestJS best practices and conventions
-- Use **dependency injection** for services
-- Implement **DTOs** for request/response validation
-- Add **Swagger decorators** for API documentation
-- Handle errors with appropriate **HTTP status codes**
-- Use **TypeORM** for database operations
-- Write **unit tests** for services and **e2e tests** for controllers
+- Server-side logic lives in **TanStack Start server functions** (`web/lib/server.ts`), not a separate API server
+- Every server function must resolve the user with `requireUserId()` and **scope all queries** to that user
+- Access D1 through **Drizzle** via `getDb()` (`drizzle-orm/d1`); never hardcode SQL in the web layer
+- Use **TanStack Router** file routes in `web/src/routes` and **TanStack Query** hooks (`web/lib/api.ts`) for dashboard state
+- Style with **Tailwind CSS** using the **semantic tokens** in `src/styles.css` (`bg-card`, `text-primary`, severity/status tokens) — never hardcode colors
+- Build reusable components in `web/components`; type props with interfaces
 
-Example controller:
+### Scanner Worker (`workers/`)
 
-```typescript
-@Controller('scans')
-@ApiTags('scans')
-export class ScansController {
-  constructor(private readonly scansService: ScansService) {}
-
-  @Post()
-  @ApiOperation({ summary: 'Create a new scan' })
-  @ApiResponse({ status: 201, type: ScanDto })
-  async create(@Body() createScanDto: CreateScanDto): Promise<ScanDto> {
-    return this.scansService.create(createScanDto);
-  }
-}
-```
-
-### Web (TanStack Start/React)
-
-- Use **TanStack Router** file routes in `web/src/routes`
-- Use **TanStack Query** for dashboard server state
-- Use **Tailwind CSS** for styling (avoid inline styles)
-- Create **reusable components** in the `components/` directory
-- Use **TypeScript interfaces** for props
-- Implement **proper error boundaries**
-- Follow **accessibility best practices** (ARIA labels, semantic HTML)
-
-Example component:
-
-```typescript
-interface ScanResultProps {
-  scanId: string;
-  findings: Finding[];
-}
-
-export function ScanResult({ scanId, findings }: ScanResultProps) {
-  return (
-    <div className="rounded-lg border bg-card p-6">
-      <h2 className="text-2xl font-bold">Scan Results</h2>
-      {/* Component content */}
-    </div>
-  );
-}
-```
+- The Worker uses **raw D1 prepared statements** (no ORM) — keep it lean
+- Note Drizzle stores `integer({ mode: "timestamp" })` as epoch **seconds**; raw writes must match
+- The **container is stateless** — it only runs scanners and returns output; all D1/R2 writes happen in the Worker
 
 ### Code Formatting
 
-Run the formatter before committing:
+OpenVScan uses **Biome** for linting and formatting in `web/`:
 
 ```bash
-pnpm format
+pnpm --filter openvscan-web exec biome check --write .
 ```
 
-Ensure linting passes:
-
-```bash
-pnpm lint
-```
-
-Fix auto-fixable issues:
-
-```bash
-pnpm lint --fix
-```
+Run `wrangler types` after changing `wrangler.jsonc` bindings to refresh generated types.
 
 ## Testing
 
-### Running Tests
-
-**All tests:**
-```bash
-pnpm test
-```
-
-**API tests only:**
-```bash
-pnpm --filter api test
-```
-
-**Web tests only:**
-```bash
-pnpm --filter web test
-```
-
-**E2E tests:**
-```bash
-pnpm test:e2e
-```
-
-**Worker tests:**
-```bash
-pytest tests/workers
-```
-
-### Writing Tests
-
-- Write **unit tests** for business logic
-- Write **integration tests** for API endpoints
-- Write **E2E tests** for critical user flows
-- Aim for **meaningful test coverage**, not just high percentages
-- Use **descriptive test names** that explain what is being tested
-
-Example test:
-
-```typescript
-describe('ScansService', () => {
-  it('should create a scan with valid configuration', async () => {
-    const createScanDto: CreateScanDto = {
-      projectId: '123',
-      targetUrl: 'https://example.com',
-      scanners: ['zap', 'trivy'],
-    };
-
-    const result = await service.create(createScanDto);
-
-    expect(result.id).toBeDefined();
-    expect(result.status).toBe('pending');
-  });
-});
-```
-
-### Test Coverage
-
-Ensure your changes maintain or improve test coverage:
+There is **no automated test suite yet** — contributions here are especially welcome. Until then, verify changes by:
 
 ```bash
-pnpm test:coverage
+pnpm build                          # web Worker builds cleanly (vite + tsc)
+pnpm --filter openvscan-workers typecheck
 ```
+
+When adding tests, prefer [`@cloudflare/vitest-pool-workers`](https://developers.cloudflare.com/workers/testing/vitest-integration/) so they run against the Workers runtime with real bindings. Write meaningful tests for business logic and critical user flows, with descriptive names.
 
 ## Submitting Changes
 
 ### Before Submitting a Pull Request
 
-1. **Run all checks** locally:
+1. **Verify locally**:
 
 ```bash
-pnpm lint
-pnpm test
 pnpm build
+pnpm --filter openvscan-workers typecheck
 ```
 
-2. **Update documentation** if you've changed APIs or added features
+2. **Update documentation** if you've changed behavior or added features
 
-3. **Add tests** for new functionality
-
-4. **Update CHANGELOG.md** if applicable
+3. **Add tests** where practical
 
 ### Creating a Pull Request
 
@@ -395,8 +255,7 @@ Add screenshots for UI changes
 - [ ] I have commented my code where necessary
 - [ ] I have updated the documentation
 - [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix/feature works
-- [ ] New and existing tests pass locally
+- [ ] New and existing checks pass locally
 ```
 
 ### Code Review Process
@@ -441,7 +300,6 @@ When suggesting features, please include:
 Contributors will be recognized in:
 - Release notes for significant contributions
 - The project README
-- Our contributors page
 
 ## License
 

@@ -1,14 +1,26 @@
 # OpenVScan
 
-OpenVScan is a web-based vulnerability scanner that integrates open-source security tools with AI to deliver smarter, faster, and more reliable pre-production security testing.
+OpenVScan is a web-based vulnerability scanner that pairs open-source security tooling with AI-assisted analysis for faster, more reliable pre-production security testing. It runs **entirely on Cloudflare** — Workers, Containers, D1, R2, and Queues.
 
 [![License](https://img.shields.io/badge/License-AGPL--3.0--only-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 ![GitHub Stars](https://img.shields.io/github/stars/Buddhsen-tripathi/openvscan?style=social)
 [![GitHub Issues](https://img.shields.io/github/issues/Buddhsen-tripathi/openvscan.svg)](https://github.com/Buddhsen-tripathi/openvscan/issues)
 
-## Quick Start
+## Architecture
 
-Get OpenVScan running locally:
+| Tier | Stack | Responsibilities |
+|------|-------|------------------|
+| **Web Worker** (`web/`) | TanStack Start, React 19, Tailwind 4, Cloudflare Workers | UI, Better-auth, server functions (project/scan CRUD), queue producer, exports |
+| **Scanner Worker** (`workers/`) | Cloudflare Worker + Container, Queues | Consumes scan jobs, runs Trivy in a container, writes findings to D1 and artifacts to R2 |
+| **Database** | Cloudflare **D1** (SQLite, Drizzle ORM) | Users, sessions, projects, scans, findings, logs |
+| **Object storage** | Cloudflare **R2** | Raw scanner output artifacts |
+| **Queue** | Cloudflare **Queues** | Decouples scan dispatch from execution |
+
+There is **no separate API server, Redis, or Postgres** — the web Worker owns data access via TanStack Start server functions, and a consumer Worker drives the scanner container.
+
+> **Plan requirement:** Cloudflare **Containers** require the Workers Paid plan ($5/mo). D1, R2, Queues, and Workers all have usable free tiers.
+
+## Quick Start
 
 ```bash
 # Clone and install
@@ -16,186 +28,137 @@ git clone https://github.com/Buddhsen-tripathi/openvscan.git
 cd openvscan
 pnpm install
 
-# Start Redis
-docker compose up -d
+# Authenticate and provision Cloudflare resources (first time only)
+pnpm --filter openvscan-web exec wrangler login
+pnpm --filter openvscan-web exec wrangler d1 create openvscan
+pnpm --filter openvscan-web exec wrangler r2 bucket create openvscan-artifacts
+pnpm --filter openvscan-web exec wrangler queues create openvscan-scans
+# → copy the printed D1 database_id into web/wrangler.jsonc and workers/wrangler.jsonc
 
-# Build shared packages and apply schema
-pnpm run prebuild
-pnpm --filter openvscan-api db:push
-
-# Start all services
-pnpm run dev
+# Apply the schema to your local D1, then start the web app
+pnpm db:migrate:local
+pnpm dev:web
 ```
 
-**Access Points:**
-- Web App: http://localhost:3000
-- API: http://localhost:5000
-- API Docs: http://localhost:5000/api/docs
+The web app runs at http://localhost:3000.
 
 ### Environment
 
-Create local environment files before running the stack.
-
-`api/.env`:
+Bindings (D1, R2, Queue) live in `wrangler.jsonc`, not `.env`. Provide secrets for local dev in `web/.dev.vars`:
 
 ```env
-PORT=5000
-FRONTEND_URL=http://localhost:3000
-LOG_LEVEL=log
-DATABASE_URL="postgresql://user:password@host/db_name"
-REDIS_URL=redis://localhost:6379
-AUTH_SECRET="generate-a-random-32-char-secret"
-SESSION_EXPIRES_IN=1d
-SESSION_UPDATE_IN=1h
-```
-
-`web/.env`:
-
-```env
-VITE_API_URL=http://localhost:5000
-VITE_APP_URL=http://localhost:3000
-BETTER_AUTH_URL=http://localhost:3000
-DATABASE_URL="postgresql://user:password@host/db_name"
 BETTER_AUTH_SECRET="generate-a-random-32-char-secret"
+BETTER_AUTH_URL=http://localhost:3000
+VITE_APP_URL=http://localhost:3000
 ```
 
-`workers/.env`:
-
-```env
-DATABASE_URL="postgresql://user:password@host/db_name"
-REDIS_URL=redis://localhost:6379
-OPENAI_API_KEY="" # Optional, for AI enrichment
-```
+Generate a secret with `openssl rand -base64 32`.
 
 ### First Run
 
 1. Go to http://localhost:3000/signup and create an account.
 2. Create a project from the dashboard.
-3. Start a scan from the project page.
-4. Open the scan details page to view status, findings, logs, and exports.
+3. Start a scan from the project page (target = a repo URL, container image, or path).
+4. Open the scan detail page to view status, findings, logs, and exports.
 
-### Troubleshooting
-
-- If shared packages are missing, run `pnpm run prebuild`.
-- If auth fails with a missing session token, clear browser cookies and sign in again.
-- If scans stay pending, confirm Redis and workers are running with `docker compose ps`.
-- If the database fails to connect, verify `DATABASE_URL` and run `pnpm --filter openvscan-api db:push`.
+> Local scan **execution** requires the scanner Worker (and Docker, for the container). Without it, scans queue but stay pending. See **Deployment**.
 
 ## Features
 
 ### Current
-- ✅ User authentication with email/password
+- ✅ Email/password authentication (Better-auth on D1)
 - ✅ Multi-tenant project management
-- ✅ Async vulnerability scanning with Trivy
-- ✅ Real-time scan status updates
-- ✅ Findings display with severity breakdown
-- ✅ Scan execution logs
-- ✅ RESTful API with Swagger documentation
+- ✅ Async vulnerability scanning with Trivy (dependencies, container images, repos)
+- ✅ Findings grouped by severity with remediation guidance
+- ✅ Scan execution logs and status polling
+- ✅ Scan cancellation (DB-flag based)
+- ✅ JSON & SARIF export
+- ✅ Raw scanner artifacts stored in R2
 
 ### Planned
-- 🔜 Multiple scanner integration (Nmap, OWASP ZAP, Semgrep)
-- 🔜 AI-powered vulnerability analysis and deduplication
-- 🔜 Export formats (SARIF, JSON, PDF)
+- 🔜 Additional scanners (Nmap, Semgrep, OWASP ZAP)
+- 🔜 AI-assisted triage in the consumer Worker
 - 🔜 Scheduled scans and baselines
-- 🔜 Team collaboration features
-- 🔜 CI/CD pipeline integration
-
-## Architecture
-
-| Tier | Stack | Responsibilities |
-|------|-------|------------------|
-| **UI** (`web/`) | TanStack Start, React 19, Tailwind CSS, Cloudflare Workers | Scan setup, dashboards, reporting |
-| **API** (`api/`) | NestJS 11, PostgreSQL (Drizzle ORM) | Auth, projects, scan orchestration |
-| **Workers** (`workers/`) | BullMQ, Redis | Execute scanners, process findings |
-| **Storage** | PostgreSQL, Redis | Metadata, queue coordination |
-| **AI** | OpenAI/Anthropic | Analysis, deduplication, remediation |
+- 🔜 CI/CD integration (GitHub Actions)
+- 🔜 Team collaboration
 
 ## Repository Structure
 
 ```
 openvscan/
-├── api/                    # NestJS backend
-│   ├── src/
-│   │   ├── common/        # Guards, interceptors, filters
-│   │   ├── database/      # Database configuration
-│   │   ├── project/       # Project CRUD
-│   │   ├── scan/          # Scan orchestration
-│   │   └── queue/         # BullMQ setup
-│   └── database/          # Migrations
-├── web/                   # TanStack Start frontend
-│   ├── src/routes/        # TanStack Router routes
-│   ├── components/        # React components
-│   ├── lib/               # API client, auth, utilities
-│   └── wrangler.jsonc     # Cloudflare Workers deployment
-├── workers/               # Background job processors
-│   ├── src/
-│   │   ├── processors/   # Job handlers
-│   │   ├── scanners/     # Scanner integrations
-│   │   └── ai/           # AI service
-├── packages/              # Shared monorepo packages
-│   ├── db/               # Database schema
-│   └── types/            # Shared TypeScript types
-└── docker-compose.yml    # Infrastructure (Redis)
+├── web/                   # TanStack Start app on Cloudflare Workers
+│   ├── src/routes/        # routes incl. api/auth/$ and api/scans.$id.export
+│   ├── components/        # auth/, dashboard/, homepage/, ui/
+│   ├── lib/               # auth.ts, db.ts, server.ts (server functions), api.ts
+│   └── wrangler.jsonc     # bindings: DB (D1), ARTIFACTS (R2), SCAN_QUEUE
+├── workers/               # Cloudflare consumer Worker (openvscan-scanner)
+│   ├── src/index.ts       # ScannerContainer + queue() handler
+│   ├── container/         # Dockerfile (node + Trivy) + server.mjs
+│   └── wrangler.jsonc     # queue consumer + D1 + R2 + Container bindings
+├── packages/
+│   ├── db/                # Drizzle SQLite schema for D1 + migrations
+│   └── types/             # Shared TypeScript types & enums
+└── package.json           # Root scripts
 ```
 
 ## Development
 
 ### Prerequisites
-- Node.js 22.12+ for TanStack Start
+- Node.js 22.12+
 - pnpm 8+
-- PostgreSQL database (Neon recommended)
-- Docker (for Redis)
-- Trivy CLI (for scanning)
+- A Cloudflare account (Workers Paid for the scanner container)
+- Docker (only to build/run the scanner container)
 
 ### Commands
 
 ```bash
-# Development
-pnpm run dev              # Start all services
-pnpm run dev:api          # API only
-pnpm run dev:web          # Web only
-pnpm run dev:workers      # Workers only
+# Develop
+pnpm dev:web                       # web Worker (local D1/R2/Queue via vite plugin)
+pnpm --filter openvscan-workers dev  # scanner Worker (needs Docker)
 
-# Building
-pnpm run prebuild         # Build shared packages
-pnpm run build            # Build all services
+# Build
+pnpm prebuild                      # build shared packages
+pnpm build                         # build the web Worker
 
-# Database
-pnpm --filter openvscan-api db:generate  # Generate migrations
-pnpm --filter openvscan-api db:push      # Apply migrations
-
-# Code Quality
-pnpm lint                 # Lint all projects
-pnpm format               # Format all code
-pnpm test                 # Run tests
+# Database (D1)
+pnpm db:generate                   # generate SQLite migrations from the schema
+pnpm db:migrate:local              # apply to local D1
+pnpm db:migrate                    # apply to remote D1
 ```
 
-### Cloudflare Web Deployment
+## Deployment
 
-The web app is a TanStack Start app configured for Cloudflare Workers.
+Everything deploys to Cloudflare.
 
 ```bash
-pnpm --filter openvscan-web build
-pnpm --filter openvscan-web exec wrangler deploy --dry-run
-pnpm --filter openvscan-web deploy
-```
+# 1. Apply migrations to remote D1
+pnpm db:migrate
 
-The deployment config lives in `web/wrangler.jsonc`.
+# 2. Deploy the scanner Worker (builds + pushes the container image — Docker required)
+pnpm --filter openvscan-workers deploy
+
+# 3. Deploy the web Worker
+pnpm deploy
+
+# 4. Set production secrets on the web Worker
+pnpm --filter openvscan-web exec wrangler secret put BETTER_AUTH_SECRET
+# also set BETTER_AUTH_URL / VITE_APP_URL to the deployed origin, then redeploy
+```
 
 ## Documentation
 
-- **[AGENTS.MD](AGENTS.MD)** - Architecture context for AI agents
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
-- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community standards
+- **[AGENTS.MD](AGENTS.MD)** — architecture context for AI agents
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** — contribution guidelines
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** — community standards
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Run tests and linting
+4. Run lint and build
 5. Submit a pull request
 
 ## License
@@ -205,10 +168,10 @@ Licensed under the GNU Affero General Public License v3.0 only. See [LICENSE](LI
 ## Acknowledgements
 
 OpenVScan builds on trusted open-source security tools:
-- [Trivy](https://github.com/aquasecurity/trivy) - Container & filesystem scanning
-- [OWASP ZAP](https://www.zaproxy.org/) - DAST scanning (planned)
-- [Nmap](https://nmap.org/) - Network scanning (planned)
-- [Semgrep](https://semgrep.dev/) - Static analysis (planned)
+- [Trivy](https://github.com/aquasecurity/trivy) — container, filesystem & repository scanning
+- [OWASP ZAP](https://www.zaproxy.org/) — DAST scanning (planned)
+- [Nmap](https://nmap.org/) — network scanning (planned)
+- [Semgrep](https://semgrep.dev/) — static analysis (planned)
 
 ---
 
