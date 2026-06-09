@@ -8,8 +8,8 @@
     "enabled": true
   },
   "vars": {
-    "VITE_API_URL": "http://localhost:5000",
-    "VITE_APP_URL": "http://localhost:3000"
+    "VITE_APP_URL": "https://openvscan-web.buddhsen-work.workers.dev",
+    "BETTER_AUTH_URL": "https://openvscan-web.buddhsen-work.workers.dev"
   },
   "d1_databases": [
     {
