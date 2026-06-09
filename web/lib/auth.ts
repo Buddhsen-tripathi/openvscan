@@ -14,13 +14,7 @@ import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { drizzle } from "drizzle-orm/d1";
 import { getEnv } from "@/src/lib/env";
 
-// Lazily constructed so the D1 binding (env.DB) is resolved at request time,
-// not at module-evaluation time (when Worker bindings are not yet populated).
-let cached: ReturnType<typeof betterAuth> | null = null;
-
-export function getAuth() {
-  if (cached) return cached;
-
+function createAuth() {
   const appUrl =
     getEnv("BETTER_AUTH_URL") ??
     getEnv("VITE_APP_URL") ??
@@ -38,7 +32,7 @@ export function getAuth() {
     },
   });
 
-  cached = betterAuth({
+  return betterAuth({
     baseURL: appUrl,
     secret: getEnv("BETTER_AUTH_SECRET"),
     trustedOrigins: [appUrl],
@@ -54,6 +48,13 @@ export function getAuth() {
     },
     plugins: [tanstackStartCookies()],
   });
+}
 
+// Lazily constructed so the D1 binding (env.DB) is resolved at request time,
+// not at module-evaluation time (when Worker bindings are not yet populated).
+let cached: ReturnType<typeof createAuth> | null = null;
+
+export function getAuth() {
+  cached ??= createAuth();
   return cached;
 }
