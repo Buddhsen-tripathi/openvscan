@@ -8,11 +8,11 @@
  * never hardcoded colors.
  */
 :root {
-  --background: oklch(92.834% 0.01395 88.675);
+  --background: oklch(97.5% 0.0095 88.675);
   --foreground: oklch(0.235 0 0);
-  --card: oklch(0.953 0.0156 86.4257);
+  --card: oklch(98.8% 0.007 86.4257);
   --card-foreground: oklch(0.235 0 0);
-  --popover: oklch(0.953 0.0156 86.4257);
+  --popover: oklch(98.8% 0.007 86.4257);
   --popover-foreground: oklch(0.235 0 0);
   --primary: oklch(0.3012 0 0);
   --primary-foreground: oklch(0.9169 0.0175 99.616);
