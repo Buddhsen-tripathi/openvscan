@@ -1,0 +1,45 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "openvscan-scanner",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-09",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  },
+  "containers": [
+    {
+      "class_name": "ScannerContainer",
+      "image": "./container/Dockerfile",
+      "instance_type": "standard-1",
+      "max_instances": 5
+    }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "SCANNER", "class_name": "ScannerContainer" }]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["ScannerContainer"]
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "openvscan",
+      "database_id": "8b891571-fba1-4760-b2ba-a7c089b7e816"
+    }
+  ],
+  "r2_buckets": [{ "binding": "ARTIFACTS", "bucket_name": "openvscan-artifacts" }],
+  "queues": {
+    "consumers": [
+      {
+        "queue": "openvscan-scans",
+        "max_batch_size": 1,
+        "max_batch_timeout": 5,
+        "max_retries": 1
+      }
+    ]
+  }
+}

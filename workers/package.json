@@ -3,31 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "license": "AGPL-3.0-only",
-  "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "ts-node src/index.ts",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^3.0.47",
-    "@ai-sdk/google": "^3.0.31",
-    "@ai-sdk/openai": "^3.0.33",
-    "@neondatabase/serverless": "^1.0.2",
-    "@openvscan/db": "workspace:*",
-    "@openvscan/types": "workspace:*",
-    "ai": "^6.0.100",
-    "bullmq": "^5.66.5",
-    "dotenv": "^17.2.3",
-    "drizzle-orm": "^0.45.1",
-    "execa": "^9.6.1",
-    "ioredis": "^5.9.2",
-    "openai": "^6.16.0"
+    "@cloudflare/containers": "^0.3.7",
+    "@cloudflare/workers-types": "^4.20260608.1",
+    "wrangler": "^4.98.0"
   },
   "devDependencies": {
-    "@types/node": "^25.0.9",
-    "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   }
 }
