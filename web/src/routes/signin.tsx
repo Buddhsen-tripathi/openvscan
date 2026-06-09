@@ -1,7 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import Image from "@/components/AppImage";
 import Link from "@/components/AppLink";
+import {
+  AuthError,
+  AuthShell,
+  PasswordField,
+} from "@/components/auth/AuthShell";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/Input";
 import { signIn } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/signin")({
@@ -17,129 +23,92 @@ function SignInPage() {
   const navigate = useNavigate();
 
   return (
-    <section className="p-3 min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
-      <div className="absolute inset-0 bg-grid-pattern opacity-[0.03]" />
-
-      <div
-        className="absolute inset-0 flex items-center justify-center blur-3xl pointer-events-none"
-        style={{ opacity: 0.15 }}
-      >
-        <div className="w-[500px] h-[500px] bg-primary/20 rounded-full animate-pulse-slow" />
-      </div>
-
-      <div className="relative bg-background/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-border/50 w-full max-w-full sm:max-w-md px-6 py-8 sm:px-8 mx-auto text-center z-10 animate-fade-in-up">
-        <div className="mb-6 flex items-center justify-center gap-2">
-          <Image
-            src="/logo.png"
-            alt="Logo"
-            width={40}
-            height={40}
-            className="rounded-lg shadow-lg shadow-primary/20"
-          />
-          <h2 className="text-2xl font-bold text-foreground tracking-tight">
-            OpenVScan
-          </h2>
-        </div>
-        <h3 className="mb-2 text-xl font-semibold text-foreground">
-          Sign in to your account
-        </h3>
-        <p className="mb-8 text-sm text-muted-foreground">
-          Continue to secure your code before it ships.
-        </p>
-
-        <form
-          className="space-y-5"
-          autoComplete="off"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            setLoading(true);
-            setError(null);
-            await signIn.email({
-              email,
-              password,
-              callbackURL: "/dashboard",
-              fetchOptions: {
-                onSuccess: () => {
-                  setLoading(false);
-                  navigate({ to: "/dashboard" });
-                },
-                onError: (ctx) => {
-                  setLoading(false);
-                  setError(ctx.error.message);
-                },
-              },
-            });
-          }}
-        >
-          {error && (
-            <div className="text-destructive text-sm text-center bg-destructive/10 py-2 rounded-lg border border-destructive/20">
-              {error}
-            </div>
-          )}
-          <div>
-            <input
-              type="email"
-              required
-              placeholder="Email Address"
-              value={email || ""}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-background/50 border border-input focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground/50 transition-all"
-            />
-          </div>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              required
-              placeholder="Password"
-              value={password || ""}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-background/50 border border-input focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground/50 transition-all pr-10"
-            />
-            <button
-              type="button"
-              className="absolute right-3 top-0 bottom-0 flex items-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-              tabIndex={-1}
-              onClick={() => setShowPassword((v) => !v)}
-            >
-              {showPassword ? "Hide" : "Show"}
-            </button>
-          </div>
-          <div className="flex justify-between items-center text-xs text-muted-foreground">
-            <label className="flex items-center gap-2 cursor-pointer hover:text-foreground transition-colors">
-              <input
-                type="checkbox"
-                className="accent-primary rounded border-input"
-              />
-              Remember me
-            </label>
-            <Link
-              href="/forgot-password"
-              className="hover:text-primary transition-colors"
-            >
-              Forgot Password?
-            </Link>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full py-3 font-semibold rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:bg-primary/90 hover:shadow-primary/40 cursor-pointer transition-all duration-300"
-            disabled={loading}
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-
-        <p className="mt-8 text-xs text-muted-foreground">
+    <AuthShell
+      title="Welcome back"
+      subtitle="Sign in to continue securing your code before it ships."
+      footer={
+        <>
           Don&apos;t have an account?{" "}
           <Link
             href="/signup"
-            className="text-primary hover:text-primary/80 font-medium transition-colors"
+            className="font-medium text-foreground underline-offset-4 hover:underline"
           >
-            Register
+            Create one
           </Link>
-        </p>
-      </div>
-    </section>
+        </>
+      }
+    >
+      <form
+        className="space-y-4"
+        autoComplete="off"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setLoading(true);
+          setError(null);
+          await signIn.email({
+            email,
+            password,
+            callbackURL: "/dashboard",
+            fetchOptions: {
+              onSuccess: () => {
+                setLoading(false);
+                navigate({ to: "/dashboard" });
+              },
+              onError: (ctx) => {
+                setLoading(false);
+                setError(ctx.error.message);
+              },
+            },
+          });
+        }}
+      >
+        {error && <AuthError message={error} />}
+
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-foreground" htmlFor="email">
+            Email
+          </label>
+          <Input
+            id="email"
+            type="email"
+            required
+            placeholder="you@company.com"
+            className="h-10"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label
+              className="text-sm font-medium text-foreground"
+              htmlFor="password"
+            >
+              Password
+            </label>
+            <Link
+              href="/forgot-password"
+              className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Forgot password?
+            </Link>
+          </div>
+          <PasswordField
+            id="password"
+            required
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            show={showPassword}
+            onToggle={() => setShowPassword((v) => !v)}
+          />
+        </div>
+
+        <Button type="submit" size="lg" className="w-full" disabled={loading}>
+          {loading ? "Signing in…" : "Sign in"}
+        </Button>
+      </form>
+    </AuthShell>
   );
 }

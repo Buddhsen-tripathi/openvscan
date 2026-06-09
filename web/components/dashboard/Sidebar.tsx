@@ -1,5 +1,3 @@
-"use client";
-
 import { useRouterState } from "@tanstack/react-router";
 import { LayoutDashboard, ScanSearch, Settings } from "lucide-react";
 import Image from "@/components/AppImage";
@@ -8,12 +6,7 @@ import { cn } from "@/lib/utils";
 import { useDashboardUser } from "./DashboardContext";
 
 const navItems = [
-  {
-    href: "/dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    exact: true,
-  },
+  { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/scans", label: "Scans", icon: ScanSearch },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
@@ -28,25 +21,25 @@ export function Sidebar() {
     exact ? pathname === href : pathname.startsWith(href);
 
   return (
-    <aside className="w-56 flex-shrink-0 bg-sidebar hidden md:flex flex-col border-r border-border/40">
+    <aside className="hidden w-60 flex-shrink-0 flex-col border-r border-sidebar-border bg-sidebar md:flex">
       {/* Logo */}
-      <div className="px-5 pt-5 pb-4">
+      <div className="px-4 pb-4 pt-5">
         <Link href="/dashboard" className="flex items-center gap-2">
           <Image
             src="/logo.png"
             alt="OpenVScan"
             width={24}
             height={24}
-            className="rounded"
+            className="rounded-md"
           />
-          <span className="text-base font-semibold tracking-tight text-sidebar-foreground">
+          <span className="font-serif text-base font-semibold tracking-tight text-sidebar-foreground">
             OpenVScan
           </span>
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 space-y-0.5">
+      <nav className="flex-1 space-y-0.5 px-3">
         {navItems.map(({ href, label, icon: Icon, exact }) => {
           const active = isActive(href, exact);
           return (
@@ -54,13 +47,13 @@ export function Sidebar() {
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors",
+                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                 active
-                  ? "bg-primary/8 text-primary"
-                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
               )}
             >
-              <Icon size={16} />
+              <Icon size={16} className="shrink-0" />
               {label}
             </Link>
           );
@@ -68,16 +61,16 @@ export function Sidebar() {
       </nav>
 
       {/* User section */}
-      <div className="px-3 pb-4 mt-auto">
-        <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-border/40">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold">
+      <div className="mt-auto p-3">
+        <div className="flex items-center gap-2.5 rounded-md border border-sidebar-border bg-sidebar-accent/40 px-3 py-2.5">
+          <div className="flex size-7 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
             {user.name?.charAt(0)?.toUpperCase() || "?"}
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-medium text-foreground truncate">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[13px] font-medium text-sidebar-foreground">
               {user.name}
             </p>
-            <p className="text-[11px] text-muted-foreground truncate">
+            <p className="truncate text-[11px] text-sidebar-foreground/60">
               {user.email}
             </p>
           </div>

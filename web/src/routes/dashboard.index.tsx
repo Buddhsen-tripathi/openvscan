@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CreateProjectButton } from "@/components/dashboard/CreateProjectButton";
+import { PageHeader } from "@/components/dashboard/PageHeader";
 import { ProjectList } from "@/components/dashboard/ProjectList";
 import WelcomeBanner from "@/components/dashboard/WelcomeBanner";
 
@@ -10,15 +11,15 @@ export const Route = createFileRoute("/dashboard/")({
 function DashboardPage() {
   return (
     <>
-      <header className="flex justify-between items-center bg-card border-b border-border px-6 py-4">
-        <h2 className="text-xl font-semibold text-foreground">Dashboard</h2>
-      </header>
+      <PageHeader title="Overview" />
 
-      <main className="flex-1 p-6 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto p-6">
         <WelcomeBanner />
 
-        <div className="flex justify-between items-center mt-8 mb-4">
-          <h3 className="text-lg font-bold text-foreground">Your Projects</h3>
+        <div className="mb-4 mt-8 flex items-center justify-between">
+          <h2 className="font-serif text-lg font-semibold text-foreground">
+            Your projects
+          </h2>
           <CreateProjectButton />
         </div>
 

@@ -1,23 +1,17 @@
-import { ScanStatus, Severity } from "@openvscan/types";
+import { ScanStatus } from "@openvscan/types";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, Download, Loader2, XCircle } from "lucide-react";
+import { Download, Loader2, XCircle } from "lucide-react";
 import Link from "@/components/AppLink";
+import { PageHeader } from "@/components/dashboard/PageHeader";
+import { SeverityBadge, StatusBadge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { api, useCancelScanMutation, useScanQuery } from "@/lib/api";
 
-const statusBadge: Record<string, string> = {
-  [ScanStatus.COMPLETED]: "bg-status-completed-muted text-status-completed",
-  [ScanStatus.FAILED]: "bg-status-failed-muted text-status-failed",
-  [ScanStatus.RUNNING]: "bg-status-running-muted text-status-running",
-  [ScanStatus.PENDING]: "bg-status-pending-muted text-status-pending",
-  [ScanStatus.CANCELLED]: "bg-status-cancelled-muted text-status-cancelled",
-};
-
-const severityBadge: Record<string, string> = {
-  [Severity.CRITICAL]: "bg-severity-critical text-severity-critical-foreground",
-  [Severity.HIGH]: "bg-severity-high text-severity-high-foreground",
-  [Severity.MEDIUM]: "bg-severity-medium text-severity-medium-foreground",
-  [Severity.LOW]: "bg-severity-low text-severity-low-foreground",
-};
+export const Route = createFileRoute("/dashboard/scans/$id")({
+  component: ScanResultsPage,
+});
 
 const severityText: Record<string, string> = {
   CRITICAL: "text-severity-critical",
@@ -25,10 +19,6 @@ const severityText: Record<string, string> = {
   MEDIUM: "text-severity-medium",
   LOW: "text-severity-low",
 };
-
-export const Route = createFileRoute("/dashboard/scans/$id")({
-  component: ScanResultsPage,
-});
 
 function ScanResultsPage() {
   const { id } = Route.useParams();
@@ -39,7 +29,7 @@ function ScanResultsPage() {
     try {
       await cancelScan.mutateAsync();
     } catch {
-      alert("Failed to cancel scan");
+      /* surfaced via mutation state */
     }
   };
 
@@ -49,10 +39,10 @@ function ScanResultsPage() {
 
   if (isLoading && !scan) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex h-full items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-3" />
-          <p className="text-muted-foreground">Loading scan results...</p>
+          <Loader2 className="mx-auto mb-3 size-7 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Loading scan results…</p>
         </div>
       </div>
     );
@@ -60,16 +50,16 @@ function ScanResultsPage() {
 
   if (error || !scan) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex h-full items-center justify-center">
         <div className="text-center">
-          <p className="text-destructive font-medium mb-2">
+          <p className="mb-2 font-medium text-destructive">
             {error instanceof Error ? error.message : "Scan not found"}
           </p>
           <Link
             href="/dashboard/scans"
-            className="text-primary hover:underline text-sm"
+            className="text-sm text-muted-foreground underline-offset-4 hover:underline"
           >
-            Back to Scans
+            Back to scans
           </Link>
         </div>
       </div>
@@ -78,133 +68,106 @@ function ScanResultsPage() {
 
   const isActive =
     scan.status === ScanStatus.RUNNING || scan.status === ScanStatus.PENDING;
+  const canExport =
+    scan.status === ScanStatus.COMPLETED && scan.findings.length > 0;
 
   return (
     <>
-      <header className="flex justify-between items-center bg-card border-b border-border px-6 py-4">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/dashboard/scans"
-            className="text-muted-foreground/60 hover:text-foreground transition-colors"
-          >
-            <ArrowLeft size={20} />
-          </Link>
-          <div>
-            <h2 className="text-xl font-semibold text-foreground">
-              Scan Results
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {scan.config.target}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          {isActive && (
-            <button
-              type="button"
-              onClick={handleCancel}
-              disabled={cancelScan.isPending}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-destructive bg-destructive/10 rounded-lg hover:bg-destructive/20 disabled:opacity-50 transition-colors"
-            >
-              <XCircle size={14} />
-              {cancelScan.isPending ? "Cancelling..." : "Cancel"}
-            </button>
-          )}
-          {scan.status === ScanStatus.COMPLETED && scan.findings.length > 0 && (
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => handleExport("json")}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground bg-muted rounded-lg hover:bg-muted/80 transition-colors"
-              >
-                <Download size={14} />
-                JSON
-              </button>
-              <button
-                type="button"
-                onClick={() => handleExport("sarif")}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground bg-muted rounded-lg hover:bg-muted/80 transition-colors"
-              >
-                <Download size={14} />
-                SARIF
-              </button>
-            </div>
-          )}
-          <div
-            className={`px-3 py-1 rounded-full text-sm font-bold ${statusBadge[scan.status] || "bg-muted text-muted-foreground"}`}
-          >
+      <PageHeader
+        backTo="/dashboard/scans"
+        title="Scan results"
+        description={scan.config.target}
+        actions={
+          <>
             {isActive && (
-              <Loader2 size={12} className="inline-block animate-spin mr-1" />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCancel}
+                disabled={cancelScan.isPending}
+                className="text-destructive hover:text-destructive"
+              >
+                <XCircle size={14} />
+                {cancelScan.isPending ? "Cancelling…" : "Cancel"}
+              </Button>
             )}
-            {scan.status.toUpperCase()}
-          </div>
-        </div>
-      </header>
+            {canExport && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleExport("json")}
+                >
+                  <Download size={14} />
+                  JSON
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleExport("sarif")}
+                >
+                  <Download size={14} />
+                  SARIF
+                </Button>
+              </>
+            )}
+            <StatusBadge status={scan.status} />
+          </>
+        }
+      />
 
-      <main className="flex-1 p-6 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto p-6">
         {isActive && (
-          <div className="mb-8 bg-status-running-muted border border-status-running/20 rounded-xl p-6 text-center">
-            <Loader2 className="w-8 h-8 animate-spin text-status-running mx-auto mb-3" />
-            <p className="text-foreground font-medium">
-              Scan is {scan.status}...
+          <Card className="mb-8 border-status-running/30 bg-status-running-muted p-6 text-center">
+            <Loader2 className="mx-auto mb-3 size-7 animate-spin text-status-running" />
+            <p className="font-medium text-foreground">
+              Scan is {scan.status}…
             </p>
-            <p className="text-muted-foreground text-sm mt-1">
+            <p className="mt-1 text-sm text-muted-foreground">
               Results will appear automatically.
             </p>
-          </div>
+          </Card>
         )}
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {["CRITICAL", "HIGH", "MEDIUM", "LOW"].map((sev) => {
             const count = scan.findings.filter(
               (f) => f.severity.toUpperCase() === sev,
             ).length;
             return (
-              <div
-                key={sev}
-                className="bg-card p-4 rounded-xl border border-border/60"
-              >
-                <div className="text-muted-foreground text-xs font-bold mb-1">
+              <Card key={sev} className="p-4">
+                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   {sev}
                 </div>
-                <div className={`text-2xl font-bold ${severityText[sev]}`}>
+                <div className={cn("mt-1 font-serif text-3xl font-semibold", severityText[sev])}>
                   {count}
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>
 
-        <div className="rounded-xl border border-border/60 bg-card overflow-hidden mb-8">
-          <div className="px-6 py-4 border-b border-border bg-muted/50 flex justify-between items-center">
-            <h3 className="font-bold text-foreground">
+        <Card className="mb-8 overflow-hidden p-0">
+          <div className="flex items-center justify-between border-b border-border bg-muted/40 px-5 py-3.5">
+            <h2 className="font-serif text-base font-semibold text-foreground">
               Findings ({scan.findings.length})
-            </h3>
+            </h2>
           </div>
           {scan.findings.length === 0 ? (
-            <div className="p-6 text-center text-muted-foreground">
-              {isActive
-                ? "Waiting for results..."
-                : "No vulnerabilities found."}
+            <div className="p-6 text-center text-sm text-muted-foreground">
+              {isActive ? "Waiting for results…" : "No vulnerabilities found."}
             </div>
           ) : (
             <div className="divide-y divide-border">
               {scan.findings.map((finding) => (
-                <div
-                  key={finding.id}
-                  className="p-6 hover:bg-muted/30 transition-colors"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-bold text-card-foreground">
+                <div key={finding.id} className="p-5 transition-colors hover:bg-accent/30">
+                  <div className="mb-2 flex items-start justify-between gap-3">
+                    <h3 className="font-medium text-card-foreground">
                       {finding.title}
-                    </h4>
-                    <span
-                      className={`px-2 py-0.5 rounded text-xs font-bold shrink-0 ml-3 ${severityBadge[finding.severity] || "bg-muted text-muted-foreground"}`}
-                    >
-                      {finding.severity}
-                    </span>
+                    </h3>
+                    <SeverityBadge severity={finding.severity} className="shrink-0" />
                   </div>
-                  <p className="text-muted-foreground text-sm mb-3">
+                  <p className="mb-3 text-sm text-muted-foreground">
                     {finding.description}
                   </p>
                   <div className="flex gap-4 text-xs text-muted-foreground/70">
@@ -212,11 +175,11 @@ function ScanResultsPage() {
                     <span>Location: {finding.location || "N/A"}</span>
                   </div>
                   {finding.remediation && (
-                    <div className="mt-3 bg-accent/50 p-3 rounded-lg border border-accent">
-                      <span className="font-bold text-accent-foreground text-xs block mb-1">
-                        Remediation:
+                    <div className="mt-3 rounded-md border border-border bg-accent/40 p-3">
+                      <span className="mb-1 block text-xs font-semibold text-accent-foreground">
+                        Remediation
                       </span>
-                      <p className="text-foreground text-sm whitespace-pre-line">
+                      <p className="whitespace-pre-line text-sm text-foreground">
                         {finding.remediation}
                       </p>
                     </div>
@@ -225,17 +188,17 @@ function ScanResultsPage() {
               ))}
             </div>
           )}
-        </div>
+        </Card>
 
         {scan.logs && scan.logs.length > 0 && (
-          <div className="rounded-xl overflow-hidden border border-border/60 bg-secondary font-mono text-sm">
-            <div className="px-6 py-3 border-b border-border bg-secondary text-muted-foreground font-bold text-xs uppercase tracking-wider">
-              Scan Logs
+          <Card className="overflow-hidden p-0 font-mono text-sm">
+            <div className="border-b border-border bg-muted/40 px-5 py-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Scan logs
             </div>
-            <div className="p-4 max-h-64 overflow-y-auto space-y-1">
+            <div className="max-h-64 space-y-1 overflow-y-auto p-4">
               {scan.logs.map((log, i) => (
                 <div key={`${log.timestamp}-${i}`} className="flex gap-2">
-                  <span className="text-muted-foreground/50 shrink-0">
+                  <span className="shrink-0 text-muted-foreground/50">
                     {new Date(log.timestamp).toLocaleTimeString()}
                   </span>
                   <span
@@ -244,7 +207,7 @@ function ScanResultsPage() {
                         ? "text-destructive"
                         : log.level === "warn"
                           ? "text-status-pending"
-                          : "text-secondary-foreground"
+                          : "text-foreground/80"
                     }
                   >
                     {log.message}
@@ -252,7 +215,7 @@ function ScanResultsPage() {
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
         )}
       </main>
     </>

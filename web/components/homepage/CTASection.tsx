@@ -1,22 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Shield, Star, Users, Zap } from "lucide-react";
 import Link from "@/components/AppLink";
 import SpotlightButton from "@/components/ui/SpotlightButton";
 
-export default function CTASection() {
-  const stats = [
-    { value: "50K+", label: "Scans Completed", icon: <Shield size={24} /> },
-    { value: "1M+", label: "Vulnerabilities Found", icon: <Zap size={24} /> },
-    { value: "5K+", label: "Active Users", icon: <Users size={24} /> },
-    { value: "99.9%", label: "Accuracy Rate", icon: <Star size={24} /> },
-  ];
+const GITHUB_REPO = "https://github.com/Buddhsen-tripathi/openvscan";
 
+export default function CTASection() {
   return (
-    <section className="relative py-32 px-4 overflow-hidden">
-      {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
+    <section className="relative overflow-hidden px-4 py-32">
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-card/40 to-background" />
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.03]" />
 
       <motion.div
@@ -24,77 +18,37 @@ export default function CTASection() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
-        className="relative max-w-4xl mx-auto text-center z-10"
+        className="relative z-10 mx-auto max-w-3xl text-center"
       >
-        <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-6 tracking-tight">
-          Ready to Secure Your
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent-foreground">
-            {" "}
-            Code?
-          </span>
+        <h2 className="mb-6 font-serif text-4xl font-semibold tracking-tight text-foreground md:text-6xl">
+          Ready to secure your code?
         </h2>
 
-        <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-          Join thousands of developers who trust our AI-powered security scanner
-          to protect their applications.
+        <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-muted-foreground">
+          Open-source scanners and AI-assisted analysis — find and fix
+          vulnerabilities before they ship.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-6 justify-center mb-20">
+        <div className="mb-10 flex flex-col justify-center gap-4 sm:flex-row sm:gap-6">
           <SpotlightButton
             as={Link}
             href="/signin"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 border-transparent h-14 px-8 text-lg"
+            className="h-14 border-transparent bg-primary px-8 text-lg text-primary-foreground hover:bg-primary/90"
           >
             Get Started
           </SpotlightButton>
           <SpotlightButton
             as={Link}
-            href="/demo"
-            className="hover:bg-muted/10 h-14 px-8 text-lg"
+            href={GITHUB_REPO}
+            className="h-14 px-8 text-lg hover:bg-accent"
           >
-            View Demo
+            View on GitHub
           </SpotlightButton>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-border pt-12">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="text-center group"
-            >
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-4 group-hover:-translate-y-1 transition-transform duration-300">
-                {stat.icon}
-              </div>
-              <div className="text-3xl font-bold text-foreground mb-1">
-                {stat.value}
-              </div>
-              <div className="text-sm text-muted-foreground">{stat.label}</div>
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="mt-16 inline-flex items-center gap-8 px-8 py-4 bg-primary/5 border border-primary/10 rounded-full backdrop-blur-sm"
-        >
-          <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-            Trusted by developers at
-          </span>
-          <div className="flex items-center gap-6 text-sm font-semibold text-foreground/80">
-            <span>Startups</span>
-            <span className="w-1 h-1 rounded-full bg-primary/50" />
-            <span>Enterprises</span>
-            <span className="w-1 h-1 rounded-full bg-primary/50" />
-            <span>Open Source</span>
-          </div>
-        </motion.div>
+        <p className="text-sm text-muted-foreground/70">
+          Open source · AGPL-3.0 · self-host or run it hosted
+        </p>
       </motion.div>
     </section>
   );

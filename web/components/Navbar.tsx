@@ -30,7 +30,7 @@ const Navbar = () => {
 
   useEffect(() => {
     fetch(`https://api.github.com/repos/${GITHUB_REPO}`)
-      .then((res) => res.json())
+      .then((res) => res.json() as Promise<{ stargazers_count?: number }>)
       .then((data) => {
         if (typeof data.stargazers_count === "number") {
           setStarCount(data.stargazers_count);
@@ -95,7 +95,7 @@ const Navbar = () => {
           </Link>
           <Link
             href="/signin"
-            className="hidden md:inline-flex items-center justify-center rounded-full bg-primary px-5 py-1.5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:bg-primary/90 hover:shadow-[0_0_15px_rgba(112,51,255,0.4)] shadow-primary/40"
+            className="hidden md:inline-flex items-center justify-center rounded-full bg-primary px-5 py-1.5 text-sm font-semibold text-primary-foreground transition-colors duration-300 hover:bg-primary/90"
           >
             Get Started
           </Link>
