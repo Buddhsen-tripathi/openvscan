@@ -16,7 +16,8 @@
     "paths": {
       "@/*": ["./*"],
       "@openvscan/db": ["../packages/db/src/index.ts"],
-      "@openvscan/types": ["../packages/types/src/index.ts"]
+      "@openvscan/types": ["../packages/types/src/index.ts"],
+      "@openvscan/github": ["../packages/github/src/index.ts"]
     }
   },
   "include": [
