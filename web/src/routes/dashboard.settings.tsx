@@ -1,15 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Lock, LogOut, User } from "lucide-react";
+import { Github, Lock, LogOut, User } from "lucide-react";
 import { useState } from "react";
+import Link from "@/components/AppLink";
 import { useDashboardUser } from "@/components/dashboard/DashboardContext";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useGithubConnectionQuery } from "@/lib/api";
 import { signOut } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/dashboard/settings")({
@@ -20,6 +17,8 @@ function SettingsPage() {
   const user = useDashboardUser();
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { data: connection } = useGithubConnectionQuery();
+  const installation = connection?.installations[0];
 
   const handleSignOut = async () => {
     setIsLoggingOut(true);
@@ -82,6 +81,47 @@ function SettingsPage() {
                 >
                   Change password
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Github size={18} className="text-muted-foreground" />
+                GitHub
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <div className="font-medium text-foreground">
+                    {installation
+                      ? `Connected as @${installation.accountLogin}`
+                      : "Not connected"}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {installation
+                      ? "Manage repositories and scan triggers."
+                      : connection?.configured
+                        ? "Install the GitHub App to scan your repositories."
+                        : "GitHub integration is not configured on this deployment."}
+                  </div>
+                </div>
+                {installation ? (
+                  <Link href="/dashboard/repositories">
+                    <Button variant="outline" size="sm">
+                      Repositories
+                    </Button>
+                  </Link>
+                ) : connection?.installUrl ? (
+                  <a href={connection.installUrl}>
+                    <Button variant="outline" size="sm">
+                      <Github size={15} className="mr-1.5" />
+                      Connect
+                    </Button>
+                  </a>
+                ) : null}
               </div>
             </CardContent>
           </Card>

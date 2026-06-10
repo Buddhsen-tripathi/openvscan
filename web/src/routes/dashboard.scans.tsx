@@ -26,11 +26,14 @@ function ScansListPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
+  const sourceName = (scan: (typeof scans)[number]) =>
+    scan.project?.name ?? scan.repository?.fullName ?? "—";
+
   const filteredScans = scans.filter((scan) => {
     const matchesSearch =
       !search ||
       scan.config.target.toLowerCase().includes(search.toLowerCase()) ||
-      scan.project.name.toLowerCase().includes(search.toLowerCase());
+      sourceName(scan).toLowerCase().includes(search.toLowerCase());
     const matchesStatus =
       statusFilter === "all" || scan.status === statusFilter;
     return matchesSearch && matchesStatus;
@@ -90,7 +93,7 @@ function ScansListPage() {
               <thead>
                 <tr className="border-b border-border bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
                   <th className="px-5 py-3 font-medium">Target</th>
-                  <th className="px-5 py-3 font-medium">Project</th>
+                  <th className="px-5 py-3 font-medium">Source</th>
                   <th className="px-5 py-3 font-medium">Status</th>
                   <th className="px-5 py-3 font-medium">Started</th>
                 </tr>
@@ -107,12 +110,23 @@ function ScansListPage() {
                       </Link>
                     </td>
                     <td className="px-5 py-3.5">
-                      <Link
-                        href={`/dashboard/projects/${scan.project.id}`}
-                        className="text-muted-foreground transition-colors hover:text-foreground"
-                      >
-                        {scan.project.name}
-                      </Link>
+                      {scan.project ? (
+                        <Link
+                          href={`/dashboard/projects/${scan.project.id}`}
+                          className="text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                          {scan.project.name}
+                        </Link>
+                      ) : scan.repository ? (
+                        <Link
+                          href={`/dashboard/repositories/${scan.repository.id}`}
+                          className="text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                          {scan.repository.fullName}
+                        </Link>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </td>
                     <td className="px-5 py-3.5">
                       <StatusBadge status={scan.status} />
