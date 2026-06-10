@@ -18,6 +18,10 @@ export default defineConfig({
         "../packages/types/src/index.ts",
         import.meta.url,
       ).pathname,
+      "@openvscan/github": new URL(
+        "../packages/github/src/index.ts",
+        import.meta.url,
+      ).pathname,
     },
   },
 });
