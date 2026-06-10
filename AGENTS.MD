@@ -21,7 +21,7 @@ OpenVScan is an all-Cloudflare application. There is no separate API server, Red
 | **Database** | Cloudflare **D1** (SQLite) | Users, sessions, projects, scans, findings, scan logs |
 | **Object storage** | Cloudflare **R2** | Raw scanner output artifacts |
 | **Queue** | Cloudflare **Queues** | Decouples scan dispatch (web) from execution (scanner Worker) |
-| **Shared packages** (`packages/`) | Drizzle schema, TS types | `@openvscan/db` (D1 schema + relations), `@openvscan/types` |
+| **Shared packages** (`packages/`) | Drizzle schema, TS types, GitHub helpers | `@openvscan/db`, `@openvscan/types`, `@openvscan/github` (octokit App auth, webhook verify, PR comment builder) |
 
 > **Plan requirement:** Cloudflare **Containers** require the Workers Paid plan ($5/mo). D1, R2, Queues, and Workers all have usable free tiers.
 
@@ -45,6 +45,23 @@ Scanner Worker  ◄────────────────────�
 ```
 
 Cancellation is a **DB flag**: the web Worker sets `scan.cancel_requested = true`; the consumer checks it before/after running and marks the scan `cancelled` (Cloudflare Queues has no random-access job removal).
+
+### GitHub-driven scans
+
+```
+GitHub App install ──► /api/github/setup    (associate installation_id with user → github_installation)
+push event ─────────► /api/github/webhook   (verify HMAC; if repo.scan_mode='automatic' &
+                                              branch matches repo.branch_filter → insert scan + enqueue
+                                              with a `github` context, incl. open-PR number)
+Scanner Worker:
+  ├─ mint installation token → authenticated clone URL → container (private-repo capable)
+  ├─ write findings → D1   (config.target in D1 stays token-free)
+  └─ if github.prNumber → POST a findings summary comment on the PR (sets scan.comment_posted)
+```
+
+A `scan` belongs to **either** a `project` (ad-hoc manual target) **or** a `repository`
+(GitHub-connected); `scan.project_id` is now nullable. GitHub login is Better-auth's social
+provider; repo access is the separate App installation.
 
 ---
 
@@ -111,9 +128,20 @@ openvscan/
 
 ### Scans (web server functions — `web/lib/server.ts`)
 - `listProjects`, `getProject`, `createProject`
-- `listScans`, `getScan`, `startScan` (inserts + `SCAN_QUEUE.send`), `cancelScan` (sets `cancel_requested`)
+- `listScans` (project **and** repository scans), `getScan`, `startScan` (inserts + `SCAN_QUEUE.send`), `cancelScan`
 - Export: `web/src/routes/api/scans.$id.export.ts` returns JSON or SARIF as a download
 - Tables: `project`, `scan`, `finding`, `scan_log` (schema in `packages/db/src/schema/scan.ts`)
+
+### GitHub integration
+- Schema: `github_installation`, `repository` (`packages/db/src/schema/github.ts`); `scan` gained
+  `repository_id`, `trigger`, `branch`, `commit_sha`, `pr_number`, `comment_posted`
+- Server fns: `web/lib/github-server.ts` (`getGithubConnection`, `listConnectableRepos`,
+  `connectRepository`, `listRepositories`, `getRepository`, `updateRepositoryConfig`,
+  `startRepositoryScan`, `disconnectRepository`)
+- Server glue: `web/lib/github.ts` (App creds, install URL, `syncInstallation`, octokit factory)
+- Routes: `web/src/routes/api/github/setup.ts` (install callback) + `webhook.ts` (push/installation)
+- UI: `dashboard.repositories.tsx` (connect/list) + `dashboard.repositories.$id.tsx` (config)
+- Provider-agnostic helpers live in `@openvscan/github`; only this package imports octokit
 
 ### Scanner execution (`workers/`)
 - **Trivy** runs in the container: `fs`, `image`, or `repo` subcommand chosen from the target shape
@@ -176,7 +204,17 @@ Bindings live in `wrangler.jsonc` (not `.env`). Local secrets go in `web/.dev.va
 BETTER_AUTH_SECRET   # 32+ char random secret
 BETTER_AUTH_URL      # deployed origin (e.g. https://openvscan-web.<acct>.workers.dev)
 VITE_APP_URL         # same origin, exposed to the client
+# GitHub (optional — enables repo connect + auto-scan + social login):
+GITHUB_APP_ID  GITHUB_APP_SLUG  GITHUB_APP_PRIVATE_KEY  GITHUB_WEBHOOK_SECRET
+GITHUB_CLIENT_ID  GITHUB_CLIENT_SECRET
 ```
+
+### Scanner Worker secrets (GitHub-linked scans)
+```
+GITHUB_APP_ID  GITHUB_APP_PRIVATE_KEY  APP_URL
+```
+See `web/.dev.vars.example` and `workers/.dev.vars.example` for local setup, and README
+"GitHub integration" for registering the App.
 
 ### Bindings (web/wrangler.jsonc)
 - `DB` → D1 database `openvscan`

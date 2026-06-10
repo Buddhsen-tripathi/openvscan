@@ -8,8 +8,8 @@
     "enabled": true
   },
   "vars": {
-    "VITE_APP_URL": "https://openvscan-web.buddhsen-work.workers.dev",
-    "BETTER_AUTH_URL": "https://openvscan-web.buddhsen-work.workers.dev"
+    "VITE_APP_URL": "https://openvscan.com",
+    "BETTER_AUTH_URL": "https://openvscan.com"
   },
   "d1_databases": [
     {
