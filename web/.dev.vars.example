@@ -1,0 +1,17 @@
+# Web Worker local secrets. Copy to `.dev.vars` and fill in.
+# (.dev.vars is gitignored; this .example file is safe to commit.)
+
+BETTER_AUTH_SECRET="generate-a-random-32-char-secret"
+BETTER_AUTH_URL=http://localhost:3000
+VITE_APP_URL=http://localhost:3000
+
+# --- GitHub integration (optional; enables repo connect + auto-scan) ---
+# From your GitHub App settings page. The private key is the .pem contents;
+# either paste it with real newlines or with escaped "\n" — both work.
+GITHUB_APP_ID=
+GITHUB_APP_SLUG=
+GITHUB_APP_PRIVATE_KEY=
+GITHUB_WEBHOOK_SECRET=
+# OAuth client (for "Continue with GitHub" social login). Can be the same App.
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=

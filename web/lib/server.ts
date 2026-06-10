@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import { ScanStatus } from "@openvscan/types";
 import { createServerFn } from "@tanstack/react-start";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, or } from "drizzle-orm";
 import { getDb, requireUserId, schema } from "@/lib/db";
 
 /* ----------------------------- Projects ----------------------------- */
@@ -58,15 +58,30 @@ export const createProject = createServerFn({ method: "POST" })
 export const listScans = createServerFn({ method: "GET" }).handler(async () => {
   const userId = await requireUserId();
   const db = getDb();
-  const userProjects = await db.query.project.findMany({
-    where: eq(schema.project.userId, userId),
-    columns: { id: true },
-  });
-  if (userProjects.length === 0) return [];
+  const [userProjects, userRepos] = await Promise.all([
+    db.query.project.findMany({
+      where: eq(schema.project.userId, userId),
+      columns: { id: true },
+    }),
+    db.query.repository.findMany({
+      where: eq(schema.repository.userId, userId),
+      columns: { id: true },
+    }),
+  ]);
   const projectIds = userProjects.map((p) => p.id);
+  const repoIds = userRepos.map((r) => r.id);
+  if (projectIds.length === 0 && repoIds.length === 0) return [];
+
+  const conditions = [];
+  if (projectIds.length) conditions.push(inArray(schema.scan.projectId, projectIds));
+  if (repoIds.length) conditions.push(inArray(schema.scan.repositoryId, repoIds));
+
   return db.query.scan.findMany({
-    where: inArray(schema.scan.projectId, projectIds),
-    with: { project: { columns: { id: true, name: true } } },
+    where: conditions.length === 1 ? conditions[0] : or(...conditions),
+    with: {
+      project: { columns: { id: true, name: true } },
+      repository: { columns: { id: true, fullName: true } },
+    },
     orderBy: [desc(schema.scan.createdAt)],
   });
 });
@@ -80,12 +95,14 @@ export const getScan = createServerFn({ method: "GET" })
       where: eq(schema.scan.id, id),
       with: {
         project: true,
+        repository: true,
         findings: true,
         logs: { orderBy: (logs, { asc }) => [asc(logs.timestamp)] },
       },
     });
     if (!scan) throw new Error("Scan not found");
-    if (scan.project.userId !== userId) throw new Error("Access denied");
+    const ownerId = scan.project?.userId ?? scan.repository?.userId;
+    if (ownerId !== userId) throw new Error("Access denied");
     return scan;
   });
 
@@ -138,10 +155,14 @@ export const cancelScan = createServerFn({ method: "POST" })
 
     const scan = await db.query.scan.findFirst({
       where: eq(schema.scan.id, id),
-      with: { project: { columns: { userId: true } } },
+      with: {
+        project: { columns: { userId: true } },
+        repository: { columns: { userId: true } },
+      },
     });
     if (!scan) throw new Error("Scan not found");
-    if (scan.project.userId !== userId) throw new Error("Access denied");
+    const ownerId = scan.project?.userId ?? scan.repository?.userId;
+    if (ownerId !== userId) throw new Error("Access denied");
 
     if (
       scan.status !== ScanStatus.PENDING &&

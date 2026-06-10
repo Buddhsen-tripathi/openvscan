@@ -4,7 +4,7 @@
   "private": true,
   "description": "OpenVScan - Open-source vulnerability scanner with AI-assisted analysis",
   "scripts": {
-    "prebuild": "pnpm --filter @openvscan/db build && pnpm --filter @openvscan/types build",
+    "prebuild": "pnpm --filter @openvscan/db build && pnpm --filter @openvscan/types build && pnpm --filter @openvscan/github build",
     "dev": "pnpm dev:web",
     "dev:web": "pnpm --filter openvscan-web dev",
     "build": "pnpm prebuild && pnpm --filter openvscan-web build",

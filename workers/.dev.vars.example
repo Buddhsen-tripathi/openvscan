@@ -1,0 +1,7 @@
+# Scanner Worker local secrets. Copy to `.dev.vars` and fill in.
+# Only needed for GitHub-linked scans (authenticated clones + PR comments).
+
+GITHUB_APP_ID=
+GITHUB_APP_PRIVATE_KEY=
+# Origin used to link back to the scan from the PR comment.
+APP_URL=http://localhost:3000

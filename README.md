@@ -54,6 +54,48 @@ VITE_APP_URL=http://localhost:3000
 
 Generate a secret with `openssl rand -base64 32`.
 
+### GitHub integration
+
+OpenVScan connects to GitHub through a **GitHub App** (repo access, push webhooks, PR
+comments) plus an OAuth client (for "Continue with GitHub" login). The GitHub features are
+optional — without them, manual project scans still work.
+
+**1. Register a GitHub App** (Settings → Developer settings → GitHub Apps → New):
+
+| Setting | Value |
+|---------|-------|
+| Webhook URL | `https://<your-web-origin>/api/github/webhook` |
+| Setup URL (callback) | `https://<your-web-origin>/api/github/setup` (check "Redirect on update") |
+| Webhook secret | a random string (becomes `GITHUB_WEBHOOK_SECRET`) |
+| Permissions | **Contents:** read, **Pull requests:** read & write, **Metadata:** read |
+| Subscribe to events | **Push**, **Pull request**, **Installation**, **Installation repositories** |
+
+Generate a private key for the App (downloads a `.pem`). The App's **App ID**, **slug**
+(from its public page URL), **Client ID/secret**, and the private key feed the secrets below.
+
+**2. Provide secrets.** Locally, copy `web/.dev.vars.example` → `web/.dev.vars` and
+`workers/.dev.vars.example` → `workers/.dev.vars` and fill them in. In production:
+
+```bash
+# Web Worker
+for s in GITHUB_APP_ID GITHUB_APP_SLUG GITHUB_APP_PRIVATE_KEY GITHUB_WEBHOOK_SECRET \
+         GITHUB_CLIENT_ID GITHUB_CLIENT_SECRET; do
+  pnpm --filter openvscan-web exec wrangler secret put "$s"
+done
+
+# Scanner Worker
+for s in GITHUB_APP_ID GITHUB_APP_PRIVATE_KEY APP_URL; do
+  pnpm --filter openvscan-workers exec wrangler secret put "$s"
+done
+```
+
+**3. Use it.** Sign in → **Repositories** → install the App on the repos you want → connect a
+repo → set its trigger to **Automatic** with an optional branch filter. On a matching push,
+OpenVScan scans the repo and (when the branch has an open PR) posts a findings summary comment.
+
+For local webhook testing, forward GitHub deliveries to your dev server with a tunnel (e.g.
+[smee.io](https://smee.io) or `cloudflared tunnel`) pointed at `localhost:3000/api/github/webhook`.
+
 ### First Run
 
 1. Go to http://localhost:3000/signup and create an account.
@@ -66,8 +108,9 @@ Generate a secret with `openssl rand -base64 32`.
 ## Features
 
 ### Current
-- ✅ Email/password authentication (Better-auth on D1)
+- ✅ Email/password **and GitHub** authentication (Better-auth on D1)
 - ✅ Multi-tenant project management
+- ✅ **GitHub App integration**: connect repos, scan automatically on push, post findings to the PR
 - ✅ Async vulnerability scanning with Trivy (dependencies, container images, repos)
 - ✅ Findings grouped by severity with remediation guidance
 - ✅ Scan execution logs and status polling
@@ -78,8 +121,9 @@ Generate a secret with `openssl rand -base64 32`.
 ### Planned
 - 🔜 Additional scanners (Nmap, Semgrep, OWASP ZAP)
 - 🔜 AI-assisted triage in the consumer Worker
+- 🔜 Inline PR review comments (per-line) + Checks API
+- 🔜 GitLab support
 - 🔜 Scheduled scans and baselines
-- 🔜 CI/CD integration (GitHub Actions)
 - 🔜 Team collaboration
 
 ## Repository Structure

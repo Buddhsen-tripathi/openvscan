@@ -18,8 +18,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
 import { Route as DashboardScansRouteImport } from './routes/dashboard.scans'
+import { Route as DashboardRepositoriesRouteImport } from './routes/dashboard.repositories'
 import { Route as DashboardScansIdRouteImport } from './routes/dashboard.scans.$id'
+import { Route as DashboardRepositoriesIdRouteImport } from './routes/dashboard.repositories.$id'
 import { Route as DashboardProjectsIdRouteImport } from './routes/dashboard.projects.$id'
+import { Route as ApiGithubWebhookRouteImport } from './routes/api/github/webhook'
+import { Route as ApiGithubSetupRouteImport } from './routes/api/github/setup'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiScansIdExportRouteImport } from './routes/api/scans.$id.export'
 
@@ -68,15 +72,35 @@ const DashboardScansRoute = DashboardScansRouteImport.update({
   path: '/scans',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardRepositoriesRoute = DashboardRepositoriesRouteImport.update({
+  id: '/repositories',
+  path: '/repositories',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardScansIdRoute = DashboardScansIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => DashboardScansRoute,
 } as any)
+const DashboardRepositoriesIdRoute = DashboardRepositoriesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DashboardRepositoriesRoute,
+} as any)
 const DashboardProjectsIdRoute = DashboardProjectsIdRouteImport.update({
   id: '/projects/$id',
   path: '/projects/$id',
   getParentRoute: () => DashboardRoute,
+} as any)
+const ApiGithubWebhookRoute = ApiGithubWebhookRouteImport.update({
+  id: '/api/github/webhook',
+  path: '/api/github/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiGithubSetupRoute = ApiGithubSetupRouteImport.update({
+  id: '/api/github/setup',
+  path: '/api/github/setup',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -96,11 +120,15 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/dashboard/repositories': typeof DashboardRepositoriesRouteWithChildren
   '/dashboard/scans': typeof DashboardScansRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/github/setup': typeof ApiGithubSetupRoute
+  '/api/github/webhook': typeof ApiGithubWebhookRoute
   '/dashboard/projects/$id': typeof DashboardProjectsIdRoute
+  '/dashboard/repositories/$id': typeof DashboardRepositoriesIdRoute
   '/dashboard/scans/$id': typeof DashboardScansIdRoute
   '/api/scans/$id/export': typeof ApiScansIdExportRoute
 }
@@ -110,11 +138,15 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/dashboard/repositories': typeof DashboardRepositoriesRouteWithChildren
   '/dashboard/scans': typeof DashboardScansRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/github/setup': typeof ApiGithubSetupRoute
+  '/api/github/webhook': typeof ApiGithubWebhookRoute
   '/dashboard/projects/$id': typeof DashboardProjectsIdRoute
+  '/dashboard/repositories/$id': typeof DashboardRepositoriesIdRoute
   '/dashboard/scans/$id': typeof DashboardScansIdRoute
   '/api/scans/$id/export': typeof ApiScansIdExportRoute
 }
@@ -126,11 +158,15 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/dashboard/repositories': typeof DashboardRepositoriesRouteWithChildren
   '/dashboard/scans': typeof DashboardScansRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/github/setup': typeof ApiGithubSetupRoute
+  '/api/github/webhook': typeof ApiGithubWebhookRoute
   '/dashboard/projects/$id': typeof DashboardProjectsIdRoute
+  '/dashboard/repositories/$id': typeof DashboardRepositoriesIdRoute
   '/dashboard/scans/$id': typeof DashboardScansIdRoute
   '/api/scans/$id/export': typeof ApiScansIdExportRoute
 }
@@ -143,11 +179,15 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signin'
     | '/signup'
+    | '/dashboard/repositories'
     | '/dashboard/scans'
     | '/dashboard/settings'
     | '/dashboard/'
     | '/api/auth/$'
+    | '/api/github/setup'
+    | '/api/github/webhook'
     | '/dashboard/projects/$id'
+    | '/dashboard/repositories/$id'
     | '/dashboard/scans/$id'
     | '/api/scans/$id/export'
   fileRoutesByTo: FileRoutesByTo
@@ -157,11 +197,15 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signin'
     | '/signup'
+    | '/dashboard/repositories'
     | '/dashboard/scans'
     | '/dashboard/settings'
     | '/dashboard'
     | '/api/auth/$'
+    | '/api/github/setup'
+    | '/api/github/webhook'
     | '/dashboard/projects/$id'
+    | '/dashboard/repositories/$id'
     | '/dashboard/scans/$id'
     | '/api/scans/$id/export'
   id:
@@ -172,11 +216,15 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signin'
     | '/signup'
+    | '/dashboard/repositories'
     | '/dashboard/scans'
     | '/dashboard/settings'
     | '/dashboard/'
     | '/api/auth/$'
+    | '/api/github/setup'
+    | '/api/github/webhook'
     | '/dashboard/projects/$id'
+    | '/dashboard/repositories/$id'
     | '/dashboard/scans/$id'
     | '/api/scans/$id/export'
   fileRoutesById: FileRoutesById
@@ -189,6 +237,8 @@ export interface RootRouteChildren {
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiGithubSetupRoute: typeof ApiGithubSetupRoute
+  ApiGithubWebhookRoute: typeof ApiGithubWebhookRoute
   ApiScansIdExportRoute: typeof ApiScansIdExportRoute
 }
 
@@ -257,6 +307,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardScansRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/repositories': {
+      id: '/dashboard/repositories'
+      path: '/repositories'
+      fullPath: '/dashboard/repositories'
+      preLoaderRoute: typeof DashboardRepositoriesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/scans/$id': {
       id: '/dashboard/scans/$id'
       path: '/$id'
@@ -264,12 +321,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardScansIdRouteImport
       parentRoute: typeof DashboardScansRoute
     }
+    '/dashboard/repositories/$id': {
+      id: '/dashboard/repositories/$id'
+      path: '/$id'
+      fullPath: '/dashboard/repositories/$id'
+      preLoaderRoute: typeof DashboardRepositoriesIdRouteImport
+      parentRoute: typeof DashboardRepositoriesRoute
+    }
     '/dashboard/projects/$id': {
       id: '/dashboard/projects/$id'
       path: '/projects/$id'
       fullPath: '/dashboard/projects/$id'
       preLoaderRoute: typeof DashboardProjectsIdRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/api/github/webhook': {
+      id: '/api/github/webhook'
+      path: '/api/github/webhook'
+      fullPath: '/api/github/webhook'
+      preLoaderRoute: typeof ApiGithubWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/github/setup': {
+      id: '/api/github/setup'
+      path: '/api/github/setup'
+      fullPath: '/api/github/setup'
+      preLoaderRoute: typeof ApiGithubSetupRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -288,6 +366,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface DashboardRepositoriesRouteChildren {
+  DashboardRepositoriesIdRoute: typeof DashboardRepositoriesIdRoute
+}
+
+const DashboardRepositoriesRouteChildren: DashboardRepositoriesRouteChildren = {
+  DashboardRepositoriesIdRoute: DashboardRepositoriesIdRoute,
+}
+
+const DashboardRepositoriesRouteWithChildren =
+  DashboardRepositoriesRoute._addFileChildren(
+    DashboardRepositoriesRouteChildren,
+  )
+
 interface DashboardScansRouteChildren {
   DashboardScansIdRoute: typeof DashboardScansIdRoute
 }
@@ -301,6 +392,7 @@ const DashboardScansRouteWithChildren = DashboardScansRoute._addFileChildren(
 )
 
 interface DashboardRouteChildren {
+  DashboardRepositoriesRoute: typeof DashboardRepositoriesRouteWithChildren
   DashboardScansRoute: typeof DashboardScansRouteWithChildren
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -308,6 +400,7 @@ interface DashboardRouteChildren {
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardRepositoriesRoute: DashboardRepositoriesRouteWithChildren,
   DashboardScansRoute: DashboardScansRouteWithChildren,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
@@ -326,6 +419,8 @@ const rootRouteChildren: RootRouteChildren = {
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiGithubSetupRoute: ApiGithubSetupRoute,
+  ApiGithubWebhookRoute: ApiGithubWebhookRoute,
   ApiScansIdExportRoute: ApiScansIdExportRoute,
 }
 export const routeTree = rootRouteImport

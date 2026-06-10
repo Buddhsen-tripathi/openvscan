@@ -1,5 +1,5 @@
 import { useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, ScanSearch, Settings } from "lucide-react";
+import { GitBranch, LayoutDashboard, ScanSearch, Settings } from "lucide-react";
 import Image from "@/components/AppImage";
 import Link from "@/components/AppLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -8,6 +8,7 @@ import { useDashboardUser } from "./DashboardContext";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
+  { href: "/dashboard/repositories", label: "Repositories", icon: GitBranch },
   { href: "/dashboard/scans", label: "Scans", icon: ScanSearch },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
