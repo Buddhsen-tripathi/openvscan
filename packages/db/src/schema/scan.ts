@@ -1,6 +1,7 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
 import { user } from './auth';
+import { repository } from './github';
 
 // Enum value sets matching @openvscan/types (SQLite has no native enum type;
 // these are enforced as CHECK constraints via drizzle's `enum` option).
@@ -14,10 +15,22 @@ export const SCAN_STATUSES = [
 
 export const SEVERITIES = ['critical', 'high', 'medium', 'low', 'info'] as const;
 
+export const SCAN_TRIGGERS = ['manual', 'push'] as const;
+
+type GithubScanContext = {
+  installationId: string;
+  owner: string;
+  repo: string;
+  branch: string;
+  commitSha: string;
+  prNumber?: number;
+};
+
 type ScanConfig = {
   target: string;
   scanners: string[];
   enableAi?: boolean;
+  github?: GithubScanContext;
 };
 
 export const project = sqliteTable('project', {
@@ -38,11 +51,25 @@ export const project = sqliteTable('project', {
 
 export const scan = sqliteTable('scan', {
   id: text('id').primaryKey(),
-  projectId: text('project_id')
-    .notNull()
-    .references(() => project.id, { onDelete: 'cascade' }),
+  // A scan belongs to either an ad-hoc project (manual target) or a connected
+  // repository (GitHub-driven). At least one is set.
+  projectId: text('project_id').references(() => project.id, {
+    onDelete: 'cascade',
+  }),
+  repositoryId: text('repository_id').references(() => repository.id, {
+    onDelete: 'cascade',
+  }),
   status: text('status', { enum: SCAN_STATUSES }).default('pending').notNull(),
   config: text('config', { mode: 'json' }).$type<ScanConfig>().notNull(),
+  // What initiated the scan, and the git context for push-triggered scans.
+  trigger: text('trigger', { enum: SCAN_TRIGGERS }).default('manual').notNull(),
+  branch: text('branch'),
+  commitSha: text('commit_sha'),
+  prNumber: integer('pr_number'),
+  // True once the findings summary has been posted back to the PR.
+  commentPosted: integer('comment_posted', { mode: 'boolean' })
+    .default(false)
+    .notNull(),
   // Set when the consumer should stop a running scan (cancel-via-flag).
   cancelRequested: integer('cancel_requested', { mode: 'boolean' })
     .default(false)
@@ -101,6 +128,10 @@ export const scanRelations = relations(scan, ({ one, many }) => ({
   project: one(project, {
     fields: [scan.projectId],
     references: [project.id],
+  }),
+  repository: one(repository, {
+    fields: [scan.repositoryId],
+    references: [repository.id],
   }),
   findings: many(finding),
   logs: many(scanLog),
