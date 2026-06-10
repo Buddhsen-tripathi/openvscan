@@ -1,0 +1,20 @@
+{
+  "name": "@openvscan/github",
+  "version": "1.0.0",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@octokit/auth-app": "^7.1.5",
+    "@octokit/webhooks-methods": "^5.1.1",
+    "octokit": "^4.1.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
