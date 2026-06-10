@@ -2,10 +2,6 @@
 
 OpenVScan is a web-based vulnerability scanner that pairs open-source security tooling with AI-assisted analysis for faster, more reliable pre-production security testing. It runs **entirely on Cloudflare** — Workers, Containers, D1, R2, and Queues.
 
-[![License](https://img.shields.io/badge/License-AGPL--3.0--only-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
-![GitHub Stars](https://img.shields.io/github/stars/buddhsen-tripathi/openvscan?style=social)
-[![GitHub Issues](https://img.shields.io/github/issues/buddhsen-tripathi/openvscan.svg)](https://github.com/Buddhsen-tripathi/openvscan/issues)
-
 ## Architecture
 
 | Tier | Stack | Responsibilities |
