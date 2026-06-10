@@ -32,6 +32,19 @@ function createAuth() {
     },
   });
 
+  // GitHub social login is enabled only when OAuth credentials are configured.
+  const githubClientId = getEnv("GITHUB_CLIENT_ID");
+  const githubClientSecret = getEnv("GITHUB_CLIENT_SECRET");
+  const socialProviders =
+    githubClientId && githubClientSecret
+      ? {
+          github: {
+            clientId: githubClientId,
+            clientSecret: githubClientSecret,
+          },
+        }
+      : undefined;
+
   return betterAuth({
     baseURL: appUrl,
     secret: getEnv("BETTER_AUTH_SECRET"),
@@ -46,6 +59,7 @@ function createAuth() {
         console.log("Reset password url:", url);
       },
     },
+    socialProviders,
     plugins: [tanstackStartCookies()],
   });
 }

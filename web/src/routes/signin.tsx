@@ -4,6 +4,7 @@ import Link from "@/components/AppLink";
 import {
   AuthError,
   AuthShell,
+  GithubAuthButton,
   PasswordField,
 } from "@/components/auth/AuthShell";
 import { Button } from "@/components/ui/button";
@@ -38,8 +39,10 @@ function SignInPage() {
         </>
       }
     >
+      <GithubAuthButton label="Continue with GitHub" />
+
       <form
-        className="space-y-4"
+        className="mt-4 space-y-4"
         autoComplete="off"
         onSubmit={async (e) => {
           e.preventDefault();
@@ -65,7 +68,10 @@ function SignInPage() {
         {error && <AuthError message={error} />}
 
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-foreground" htmlFor="email">
+          <label
+            className="text-sm font-medium text-foreground"
+            htmlFor="email"
+          >
             Email
           </label>
           <Input

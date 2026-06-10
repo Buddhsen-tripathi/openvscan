@@ -1,7 +1,8 @@
-import { FileDown, ListTree, ScanLine } from "lucide-react";
-import type { ReactNode } from "react";
+import { FileDown, Github, ListTree, ScanLine } from "lucide-react";
+import { type ReactNode, useState } from "react";
 import Image from "@/components/AppImage";
 import Link from "@/components/AppLink";
+import { signIn } from "@/lib/auth-client";
 
 interface AuthShellProps {
   title: string;
@@ -114,6 +115,49 @@ export function AuthShell({
           </div>
         </div>
       </section>
+    </div>
+  );
+}
+
+/**
+ * "Continue with GitHub" social-login button. Kicks off the Better-auth GitHub
+ * OAuth flow; on success the user lands on the dashboard. When GitHub OAuth is
+ * not configured the call fails and we surface a short hint.
+ */
+export function GithubAuthButton({ label }: { label: string }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  return (
+    <div className="space-y-3">
+      <button
+        type="button"
+        disabled={loading}
+        onClick={async () => {
+          setLoading(true);
+          setError(null);
+          try {
+            await signIn.social({
+              provider: "github",
+              callbackURL: "/dashboard",
+            });
+          } catch {
+            setLoading(false);
+            setError("GitHub sign-in is not available. Try email instead.");
+          }
+        }}
+        className="flex h-10 w-full items-center justify-center gap-2 rounded-md border border-input bg-background/40 text-sm font-medium text-foreground shadow-xs transition-colors hover:bg-accent/50 disabled:opacity-60"
+      >
+        <Github size={16} />
+        {loading ? "Redirecting…" : label}
+      </button>
+      {error && <p className="text-center text-xs text-destructive">{error}</p>}
+
+      <div className="flex items-center gap-3">
+        <span className="h-px flex-1 bg-border" />
+        <span className="text-xs text-muted-foreground">or</span>
+        <span className="h-px flex-1 bg-border" />
+      </div>
     </div>
   );
 }

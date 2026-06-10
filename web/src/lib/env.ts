@@ -6,6 +6,13 @@ type WebEnv = {
   BETTER_AUTH_URL?: string;
   VITE_APP_URL?: string;
   VITE_API_URL?: string;
+  // GitHub App + OAuth (see README "GitHub integration").
+  GITHUB_APP_ID?: string;
+  GITHUB_APP_SLUG?: string;
+  GITHUB_APP_PRIVATE_KEY?: string;
+  GITHUB_WEBHOOK_SECRET?: string;
+  GITHUB_CLIENT_ID?: string;
+  GITHUB_CLIENT_SECRET?: string;
 };
 
 const workerEnv = env as WebEnv;
