@@ -1,4 +1,11 @@
 import { Container } from "@cloudflare/containers";
+import {
+  authenticatedCloneUrl,
+  buildFindingsComment,
+  getInstallationToken,
+  installationOctokit,
+  postPrComment,
+} from "@openvscan/github";
 
 /**
  * Stateless scanner container. Runs Trivy and returns findings over HTTP.
@@ -16,11 +23,24 @@ interface Env {
   DB: D1Database;
   ARTIFACTS: R2Bucket;
   SCANNER: DurableObjectNamespace<ScannerContainer>;
+  // GitHub App credentials (for authenticated clones + posting PR comments).
+  GITHUB_APP_ID?: string;
+  GITHUB_APP_PRIVATE_KEY?: string;
+  APP_URL?: string;
 }
+
+type GithubScanContext = {
+  installationId: string;
+  owner: string;
+  repo: string;
+  branch: string;
+  commitSha: string;
+  prNumber?: number;
+};
 
 type ScanJob = {
   scanId: string;
-  config: { target: string; scanners: string[] };
+  config: { target: string; scanners: string[]; github?: GithubScanContext };
 };
 
 type RawFinding = {
@@ -35,6 +55,62 @@ type RawFinding = {
 // Drizzle stores `integer({ mode: "timestamp" })` as Unix epoch *seconds*.
 const nowSec = () => Math.floor(Date.now() / 1000);
 const uuid = () => crypto.randomUUID();
+
+/** GitHub App credentials from env, or null when unconfigured. */
+function appCreds(env: Env): { appId: string; privateKey: string } | null {
+  const appId = env.GITHUB_APP_ID;
+  const key = env.GITHUB_APP_PRIVATE_KEY;
+  if (!appId || !key) return null;
+  return { appId, privateKey: key.replace(/\\n/g, "\n") };
+}
+
+/**
+ * Post the findings summary back to the source PR. Best-effort: any failure is
+ * logged and swallowed so it never fails the scan itself.
+ */
+async function postFindingsToPr(
+  env: Env,
+  scanId: string,
+  github: GithubScanContext,
+  findings: RawFinding[],
+) {
+  const db = env.DB;
+  if (!github.prNumber) {
+    await logLine(
+      db,
+      scanId,
+      "info",
+      `No open PR for ${github.branch}; results available in the dashboard`,
+    );
+    return;
+  }
+  const creds = appCreds(env);
+  if (!creds) return;
+
+  try {
+    const octokit = installationOctokit({
+      ...creds,
+      installationId: github.installationId,
+    });
+    const body = buildFindingsComment({
+      scanId,
+      repoFullName: `${github.owner}/${github.repo}`,
+      branch: github.branch,
+      commitSha: github.commitSha,
+      findings,
+      appUrl: env.APP_URL ?? "",
+    });
+    await postPrComment(octokit, github.owner, github.repo, github.prNumber, body);
+    await db
+      .prepare("UPDATE scan SET comment_posted = 1 WHERE id = ?")
+      .bind(scanId)
+      .run();
+    await logLine(db, scanId, "info", `Posted results to PR #${github.prNumber}`);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    await logLine(db, scanId, "warn", `Could not post PR comment: ${message}`);
+  }
+}
 
 async function logLine(
   db: D1Database,
@@ -97,6 +173,28 @@ async function process(job: ScanJob, env: Env) {
   await setStatus(db, scanId, "running", { startedAt: nowSec() });
   await logLine(db, scanId, "info", `Scanning ${config.target} with Trivy`);
 
+  // For GitHub-linked scans, clone with an installation token (enables private
+  // repos). The token is injected only into the container request — the clean
+  // URL is what's persisted in D1.
+  let containerConfig = config;
+  if (config.github) {
+    const creds = appCreds(env);
+    if (creds) {
+      const token = await getInstallationToken({
+        ...creds,
+        installationId: config.github.installationId,
+      });
+      containerConfig = {
+        ...config,
+        target: authenticatedCloneUrl(
+          config.github.owner,
+          config.github.repo,
+          token,
+        ),
+      };
+    }
+  }
+
   // Run the scan in a per-scan container instance.
   const container = env.SCANNER.getByName(scanId);
   await container.startAndWaitForPorts();
@@ -104,7 +202,7 @@ async function process(job: ScanJob, env: Env) {
     new Request("http://scanner/scan", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(config),
+      body: JSON.stringify(containerConfig),
     }),
   );
   if (!res.ok) {
@@ -157,6 +255,11 @@ async function process(job: ScanJob, env: Env) {
     artifactKey,
   });
   await logLine(db, scanId, "info", `Completed with ${findings.length} finding(s)`);
+
+  // Post the summary back to the source pull request, if any.
+  if (config.github) {
+    await postFindingsToPr(env, scanId, config.github, findings);
+  }
 }
 
 export default {
