@@ -5,6 +5,7 @@ import { createContext, useContext } from "react";
 interface DashboardUser {
   name: string;
   email: string;
+  image?: string | null;
 }
 
 interface DashboardContextType {

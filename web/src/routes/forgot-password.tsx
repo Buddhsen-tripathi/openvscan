@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import Link from "@/components/AppLink";
 import {
@@ -8,8 +8,15 @@ import {
 } from "@/components/auth/AuthShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
+import { getSession } from "@/src/lib/session";
 
 export const Route = createFileRoute("/forgot-password")({
+  // Already signed in? No need for the reset flow.
+  beforeLoad: async () => {
+    if (await getSession()) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: ForgotPasswordPage,
 });
 
@@ -44,8 +51,10 @@ function ForgotPasswordPage() {
           setError(null);
           setSuccess(false);
           try {
+            // Relative URL resolves against the current origin — works in dev
+            // (:3000) and prod (openvscan.com) without a hardcoded host.
             const response = await fetch(
-              `${import.meta.env.VITE_APP_URL || "http://localhost:3000"}/api/auth/request-password-reset`,
+              "/api/auth/request-password-reset",
               {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

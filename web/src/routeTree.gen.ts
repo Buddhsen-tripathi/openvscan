@@ -19,6 +19,7 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
 import { Route as DashboardScansRouteImport } from './routes/dashboard.scans'
 import { Route as DashboardRepositoriesRouteImport } from './routes/dashboard.repositories'
+import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardScansIdRouteImport } from './routes/dashboard.scans.$id'
 import { Route as DashboardRepositoriesIdRouteImport } from './routes/dashboard.repositories.$id'
 import { Route as DashboardProjectsIdRouteImport } from './routes/dashboard.projects.$id'
@@ -77,6 +78,11 @@ const DashboardRepositoriesRoute = DashboardRepositoriesRouteImport.update({
   path: '/repositories',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardProfileRoute = DashboardProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardScansIdRoute = DashboardScansIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/repositories': typeof DashboardRepositoriesRouteWithChildren
   '/dashboard/scans': typeof DashboardScansRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/repositories': typeof DashboardRepositoriesRouteWithChildren
   '/dashboard/scans': typeof DashboardScansRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/repositories': typeof DashboardRepositoriesRouteWithChildren
   '/dashboard/scans': typeof DashboardScansRouteWithChildren
   '/dashboard/settings': typeof DashboardSettingsRoute
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signin'
     | '/signup'
+    | '/dashboard/profile'
     | '/dashboard/repositories'
     | '/dashboard/scans'
     | '/dashboard/settings'
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signin'
     | '/signup'
+    | '/dashboard/profile'
     | '/dashboard/repositories'
     | '/dashboard/scans'
     | '/dashboard/settings'
@@ -216,6 +227,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signin'
     | '/signup'
+    | '/dashboard/profile'
     | '/dashboard/repositories'
     | '/dashboard/scans'
     | '/dashboard/settings'
@@ -314,6 +326,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRepositoriesRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/profile': {
+      id: '/dashboard/profile'
+      path: '/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof DashboardProfileRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/scans/$id': {
       id: '/dashboard/scans/$id'
       path: '/$id'
@@ -392,6 +411,7 @@ const DashboardScansRouteWithChildren = DashboardScansRoute._addFileChildren(
 )
 
 interface DashboardRouteChildren {
+  DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardRepositoriesRoute: typeof DashboardRepositoriesRouteWithChildren
   DashboardScansRoute: typeof DashboardScansRouteWithChildren
   DashboardSettingsRoute: typeof DashboardSettingsRoute
@@ -400,6 +420,7 @@ interface DashboardRouteChildren {
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardProfileRoute: DashboardProfileRoute,
   DashboardRepositoriesRoute: DashboardRepositoriesRouteWithChildren,
   DashboardScansRoute: DashboardScansRouteWithChildren,
   DashboardSettingsRoute: DashboardSettingsRoute,

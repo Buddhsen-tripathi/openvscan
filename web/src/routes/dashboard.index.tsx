@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, Github } from "lucide-react";
 import Link from "@/components/AppLink";
 import { CreateProjectButton } from "@/components/dashboard/CreateProjectButton";
+import { OverviewStats } from "@/components/dashboard/OverviewStats";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { ProjectList } from "@/components/dashboard/ProjectList";
 import WelcomeBanner from "@/components/dashboard/WelcomeBanner";
@@ -49,6 +50,10 @@ function DashboardPage() {
       <main className="flex-1 overflow-y-auto p-6">
         <WelcomeBanner />
         <ConnectGithubCTA />
+
+        <div className="mt-8">
+          <OverviewStats />
+        </div>
 
         <div className="mb-4 mt-8 flex items-center justify-between">
           <h2 className="font-serif text-lg font-semibold text-foreground">

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import Link from "@/components/AppLink";
 import {
@@ -10,8 +10,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { signUp } from "@/lib/auth-client";
+import { getSession } from "@/src/lib/session";
 
 export const Route = createFileRoute("/signup")({
+  // Already signed in? Skip the form and go to the dashboard.
+  beforeLoad: async () => {
+    if (await getSession()) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: SignUpPage,
 });
 

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import Link from "@/components/AppLink";
 import {
@@ -9,8 +9,15 @@ import {
 } from "@/components/auth/AuthShell";
 import { Button } from "@/components/ui/button";
 import { resetPassword } from "@/lib/auth-client";
+import { getSession } from "@/src/lib/session";
 
 export const Route = createFileRoute("/reset-password")({
+  // Already signed in? Send them to the dashboard rather than the reset form.
+  beforeLoad: async () => {
+    if (await getSession()) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: ResetPasswordPage,
 });
 

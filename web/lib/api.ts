@@ -11,15 +11,19 @@ import {
 } from "@/lib/github-server";
 import {
   cancelScan,
+  changePassword,
   createProject,
+  getProfile,
   getProject,
   getScan,
   listProjects,
   listScans,
   startScan,
+  updateProfile,
 } from "@/lib/server";
 
 export const queryKeys = {
+  profile: ["profile"] as const,
   projects: ["projects"] as const,
   project: (id: string) => ["projects", id] as const,
   scans: ["scans"] as const,
@@ -108,6 +112,33 @@ export function useCancelScanMutation(id: string) {
       queryClient.invalidateQueries({ queryKey: queryKeys.scan(id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.scans });
     },
+  });
+}
+
+/* ------------------------------ Profile ------------------------------ */
+
+export function useProfileQuery() {
+  return useQuery({
+    queryKey: queryKeys.profile,
+    queryFn: () => getProfile(),
+  });
+}
+
+export function useUpdateProfileMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { name: string; image?: string | null }) =>
+      updateProfile({ data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile });
+    },
+  });
+}
+
+export function useChangePasswordMutation() {
+  return useMutation({
+    mutationFn: (data: { currentPassword: string; newPassword: string }) =>
+      changePassword({ data }),
   });
 }
 

@@ -4,6 +4,10 @@ import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+  // Pin the dev server to 3000 so the browser origin matches BETTER_AUTH_URL
+  // (http://localhost:3000). Otherwise Better-auth rejects sign-in/sign-up with
+  // INVALID_ORIGIN because the request Origin (Vite's default :5173) isn't trusted.
+  server: { port: 3000 },
   plugins: [
     cloudflare({ viteEnvironment: { name: "ssr" } }),
     tanstackStart(),

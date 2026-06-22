@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import Link from "@/components/AppLink";
 import {
@@ -10,8 +10,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { signIn } from "@/lib/auth-client";
+import { getSession } from "@/src/lib/session";
 
 export const Route = createFileRoute("/signin")({
+  // Already signed in? Don't show the auth form — go to the dashboard.
+  beforeLoad: async () => {
+    if (await getSession()) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: SignInPage,
 });
 
@@ -55,7 +62,17 @@ function SignInPage() {
             fetchOptions: {
               onSuccess: () => {
                 setLoading(false);
-                navigate({ to: "/dashboard" });
+                // Honor a post-login destination (the GitHub setup callback
+                // bounces unauthenticated users through /signin?redirect=…). It
+                // may be a non-router path, so use a full navigation when set.
+                const target = new URLSearchParams(window.location.search).get(
+                  "redirect",
+                );
+                if (target) {
+                  window.location.href = target;
+                } else {
+                  navigate({ to: "/dashboard" });
+                }
               },
               onError: (ctx) => {
                 setLoading(false);
