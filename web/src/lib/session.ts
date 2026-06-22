@@ -25,6 +25,7 @@ export const requireSession = createServerFn({ method: "GET" }).handler(
       user: {
         name: session.user.name,
         email: session.user.email,
+        image: session.user.image ?? null,
       },
     };
   },

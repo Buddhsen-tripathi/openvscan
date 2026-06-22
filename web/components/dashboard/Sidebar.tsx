@@ -1,5 +1,11 @@
 import { useRouterState } from "@tanstack/react-router";
-import { GitBranch, LayoutDashboard, ScanSearch, Settings } from "lucide-react";
+import {
+  GitBranch,
+  LayoutDashboard,
+  ScanSearch,
+  Settings,
+  User,
+} from "lucide-react";
 import Image from "@/components/AppImage";
 import Link from "@/components/AppLink";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -10,6 +16,7 @@ const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/repositories", label: "Repositories", icon: GitBranch },
   { href: "/dashboard/scans", label: "Scans", icon: ScanSearch },
+  { href: "/dashboard/profile", label: "Profile", icon: User },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
@@ -65,17 +72,32 @@ export function Sidebar() {
       {/* User section */}
       <div className="mt-auto p-3">
         <div className="flex items-center gap-2.5 rounded-md border border-sidebar-border bg-sidebar-accent/40 px-3 py-2.5">
-          <div className="flex size-7 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
-            {user.name?.charAt(0)?.toUpperCase() || "?"}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[13px] font-medium text-sidebar-foreground">
-              {user.name}
-            </p>
-            <p className="truncate text-[11px] text-sidebar-foreground/60">
-              {user.email}
-            </p>
-          </div>
+          <Link
+            href="/dashboard/profile"
+            className="flex min-w-0 flex-1 items-center gap-2.5"
+          >
+            {user.image ? (
+              <Image
+                src={user.image}
+                alt={user.name}
+                width={28}
+                height={28}
+                className="size-7 shrink-0 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+                {user.name?.charAt(0)?.toUpperCase() || "?"}
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[13px] font-medium text-sidebar-foreground">
+                {user.name}
+              </p>
+              <p className="truncate text-[11px] text-sidebar-foreground/60">
+                {user.email}
+              </p>
+            </div>
+          </Link>
           <ThemeToggle className="size-7 shrink-0" />
         </div>
       </div>

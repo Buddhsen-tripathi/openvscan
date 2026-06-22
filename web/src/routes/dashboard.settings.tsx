@@ -77,7 +77,7 @@ function SettingsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => navigate({ to: "/forgot-password" })}
+                  onClick={() => navigate({ to: "/dashboard/profile" })}
                 >
                   Change password
                 </Button>

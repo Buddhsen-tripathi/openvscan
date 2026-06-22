@@ -1,7 +1,9 @@
 import { env } from "cloudflare:workers";
 import { ScanStatus } from "@openvscan/types";
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeaders } from "@tanstack/react-start/server";
 import { and, desc, eq, inArray, or } from "drizzle-orm";
+import { getAuth } from "@/lib/auth";
 import { getDb, requireUserId, schema } from "@/lib/db";
 
 /* ----------------------------- Projects ----------------------------- */
@@ -193,4 +195,69 @@ export const cancelScan = createServerFn({ method: "POST" })
       message: "Cancellation requested",
       status: scan.status,
     };
+  });
+
+/* ------------------------------ Profile ----------------------------- */
+
+export const getProfile = createServerFn({ method: "GET" }).handler(async () => {
+  const userId = await requireUserId();
+  const db = getDb();
+  const [u, credential] = await Promise.all([
+    db.query.user.findFirst({ where: eq(schema.user.id, userId) }),
+    // A "credential" account means the user has a password (vs GitHub-only).
+    db.query.account.findFirst({
+      where: and(
+        eq(schema.account.userId, userId),
+        eq(schema.account.providerId, "credential"),
+      ),
+      columns: { id: true },
+    }),
+  ]);
+  if (!u) throw new Error("User not found");
+  return {
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    image: u.image,
+    emailVerified: u.emailVerified,
+    createdAt: u.createdAt,
+    hasPassword: Boolean(credential),
+  };
+});
+
+export const updateProfile = createServerFn({ method: "POST" })
+  .validator((data: { name: string; image?: string | null }) => data)
+  .handler(async ({ data }) => {
+    // requireUserId both authorizes and ensures a session exists for the
+    // Better-auth call below.
+    await requireUserId();
+    const name = data.name?.trim();
+    if (!name) throw new Error("Name is required");
+    const image = data.image?.trim() || null;
+    await getAuth().api.updateUser({
+      body: { name, image },
+      headers: getRequestHeaders(),
+    });
+    return { success: true };
+  });
+
+export const changePassword = createServerFn({ method: "POST" })
+  .validator(
+    (data: { currentPassword: string; newPassword: string }) => data,
+  )
+  .handler(async ({ data }) => {
+    await requireUserId();
+    if (!data.currentPassword) throw new Error("Current password is required");
+    if (!data.newPassword || data.newPassword.length < 8) {
+      throw new Error("New password must be at least 8 characters");
+    }
+    await getAuth().api.changePassword({
+      body: {
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+        revokeOtherSessions: false,
+      },
+      headers: getRequestHeaders(),
+    });
+    return { success: true };
   });
